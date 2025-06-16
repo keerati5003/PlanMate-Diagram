@@ -1,0 +1,114 @@
+@startuml
+title DAO and Implementation Overview with Methods
+
+interface AssignmentDao {
+    +save(assignment: Assignment): void
+    +saveAll(assignments: List<Assignment>): void
+    +findByCourse(course: Course): List<Assignment>
+}
+
+interface AvailabilityDao {
+    +save(availability: Availability): void
+    +saveAll(availabilities: List<Availability>): void
+    +findByUser(user: User): List<Availability>
+}
+
+interface CourseDao {
+    +save(course: Course): void
+    +saveAll(courses: List<Course>): void
+    +findByTerm(term: Term): List<Course>
+}
+
+interface ExamDao {
+    +save(exam: Exam): void
+    +saveAll(exams: List<Exam>): void
+    +findByCourse(course: Course): List<Exam>
+}
+
+interface StudyPreferenceDao {
+    +savePreference(preference: StudyPreference): StudyPreference
+    +findByUserUid(userUid: String): Optional<StudyPreference>
+}
+
+interface TermDao {
+    +save(term: Term): void
+    +findByUser(user: User): Term
+}
+
+interface TopicDao {
+    +save(topic: Topic): Topic
+    +saveAll(topics: List<Topic>): void
+    +findByCourse(course: Course): List<Topic>
+}
+
+interface UserDao {
+    +save(user: User): User
+    +findByUid(uid: String): User
+    +findByEmail(email: String): Optional<User>
+}
+
+' === DAO IMPLEMENTATIONS ===
+class AssignmentDaoImpl {
+    - entityManager: EntityManager
+    +save(assignment: Assignment): void
+    +saveAll(assignments: List<Assignment>): void
+    +findByCourse(course: Course): List<Assignment>
+}
+
+class AvailabilityDaoImpl {
+    - entityManager: EntityManager
+    +save(availability: Availability): void
+    +saveAll(availabilities: List<Availability>): void
+    +findByUser(user: User): List<Availability>
+}
+
+class CourseDaoImpl {
+    - entityManager: EntityManager
+    +save(course: Course): void
+    +saveAll(courses: List<Course>): void
+    +findByTerm(term: Term): List<Course>
+}
+
+class ExamDaoImpl {
+    - entityManager: EntityManager
+    +save(exam: Exam): void
+    +saveAll(exams: List<Exam>): void
+    +findByCourse(course: Course): List<Exam>
+}
+
+class StudyPreferenceDaoImpl {
+    - entityManager: EntityManager
+    +savePreference(preference: StudyPreference): StudyPreference
+    +findByUserUid(userUid: String): Optional<StudyPreference>
+}
+
+class TermDaoImpl {
+    - entityManager: EntityManager
+    +save(term: Term): void
+    +findByUser(user: User): Term
+}
+
+class TopicDaoImpl {
+    - entityManager: EntityManager
+    +save(topic: Topic): Topic
+    +saveAll(topics: List<Topic>): void
+    +findByCourse(course: Course): List<Topic>
+}
+
+class UserDaoImpl {
+    - entityManager: EntityManager
+    +save(user: User): User
+    +findByUid(uid: String): User
+    +findByEmail(email: String): Optional<User>
+}
+
+AssignmentDaoImpl ..|> AssignmentDao
+AvailabilityDaoImpl ..|> AvailabilityDao
+CourseDaoImpl ..|> CourseDao
+ExamDaoImpl ..|> ExamDao
+StudyPreferenceDaoImpl ..|> StudyPreferenceDao
+TermDaoImpl ..|> TermDao
+TopicDaoImpl ..|> TopicDao
+UserDaoImpl ..|> UserDao
+
+@enduml

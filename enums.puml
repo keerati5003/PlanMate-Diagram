@@ -1,0 +1,9 @@
+@startuml
+title Enum Class Diagram
+
+enum ExamType {
+    MIDTERM
+    FINAL
+}
+
+@enduml

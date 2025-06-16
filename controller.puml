@@ -1,0 +1,38 @@
+@startuml
+title Controller Layer Class Diagram
+
+class StudyPreferenceController {
+    - preferenceService : StudyPreferenceService
+    + save(dto: StudyPreferenceDTO) : ResponseEntity<StudyPreferenceDTO>
+    + get() : ResponseEntity<StudyPreferenceDTO>
+    + update(dto: StudyPreferenceDTO) : ResponseEntity<StudyPreferenceDTO>
+    - getAuthenticatedUid() : String
+}
+
+class StudySetupController {
+    - studySetupService : StudySetupService
+    + getStudySetup() : ResponseEntity<StudySetupDTO>
+    + setupStudyPlan(dto: StudySetupDTO) : ResponseEntity<Void>
+    - getAuthenticatedUid() : String
+}
+
+class UserController {
+    + getProfile(request: HttpServletRequest) : ResponseEntity<?>
+}
+
+class UtilController {
+    + handlePing() : ResponseEntity<Void>
+    + handleLogout(authHeader: String) : ResponseEntity<Void>
+}
+
+interface StudyPreferenceService {
+    + saveOrUpdate(uid: String, dto: StudyPreferenceDTO) : StudyPreferenceDTO
+    + getPreference(uid: String) : Optional<StudyPreferenceDTO>
+}
+
+interface StudySetupService {
+    + getStudySetup(uid: String) : StudySetupDTO
+    + processStudySetup(uid: String, dto: StudySetupDTO) : void
+}
+
+@enduml

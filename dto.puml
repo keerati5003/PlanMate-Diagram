@@ -1,0 +1,73 @@
+@startuml
+title DTO Class Diagram
+
+class AIPlanRequestDTO {
+    - StudyPreferenceDTO studyPreference
+    - List<AvailabilityDTO> availabilities
+    - List<CourseDTO> courses
+    - List<TopicDTO> topics
+    - List<AssignmentDTO> assignments
+    - List<ExamDTO> exams
+}
+
+class StudyPreferenceDTO {
+    - String userUid
+    - Integer minSessionDuration
+    - Integer maxSessionDuration
+    - List<String> preferredStudyTimes
+    - String revisionFrequency
+    - Integer breakDurations
+}
+
+class AvailabilityDTO {
+    - LocalDate date
+    - String startTime
+    - String endTime
+}
+
+class CourseDTO {
+    - String id
+    - String name
+    - Long credit
+    - List<TopicDTO> topics
+    - List<AssignmentDTO> assignments
+    - List<ExamDTO> exams
+}
+
+class TopicDTO {
+    - String name
+    - Long difficulty
+    - Long confidence
+    - Long estimatedStudyTime
+    - ExamType examType
+}
+
+class AssignmentDTO {
+    - String name
+    - LocalDate dueDate
+    - String dueTime
+    - Long estimatedTime
+    - List<String> associatedTopicTitles
+}
+
+class ExamDTO {
+    - ExamType type
+    - LocalDate date
+    - String startTime
+    - String endTime
+}
+
+class StudySetupDTO {
+    - String userUid
+    - TermDTO term
+    - List<AvailabilityDTO> availabilities
+}
+
+class TermDTO {
+    - String name
+    - String startDate
+    - String endDate
+    - List<CourseDTO> courses
+}
+
+@enduml

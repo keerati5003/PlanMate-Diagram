@@ -1,0 +1,37 @@
+@startuml
+title Repository Interfaces UML Class Diagram
+
+interface AssignmentRepository {
+    + findByCourse(course: Course) : List<Assignment>
+}
+
+interface AvailabilityRepository {
+    + findByUser(user: User) : List<Availability>
+}
+
+interface CourseRepository {
+    + findByTerm(term: Term) : List<Course>
+}
+
+interface ExamRepository {
+    + findByCourse(course: Course) : List<Exam>
+}
+
+interface StudyPreferenceRepository {
+    // no custom methods
+}
+
+interface TermRepository {
+    + findByUser(user: User) : Term
+}
+
+interface TopicRepository {
+    + findByCourse(course: Course) : List<Topic>
+}
+
+interface UserRepository {
+    + findByUid(uid: String) : User
+    + findByEmail(email: String) : Optional<User>
+}
+
+@enduml

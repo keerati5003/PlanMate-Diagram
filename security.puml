@@ -1,0 +1,38 @@
+@startuml
+title Security Classes UML Class Diagram
+
+class FirebaseConfig {
+    - firebaseCredentialsPath : String
+    + firebaseAuth() : FirebaseAuth
+}
+
+class FirebaseTokenVerifier {
+    - userService : UserService
+    + FirebaseTokenVerifier(userService: UserService)
+    + doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain) : void
+}
+
+class SecurityConfig {
+    - firebaseTokenVerifier : FirebaseTokenVerifier
+    + SecurityConfig(firebaseTokenVerifier: FirebaseTokenVerifier)
+    + securityFilterChain(http: HttpSecurity) : SecurityFilterChain
+}
+
+interface UserService {
+    + findByUid(uid: String) : User
+    + save(user: User) : User
+}
+
+class UsernamePasswordAuthenticationToken {
+    + UsernamePasswordAuthenticationToken(principal: Object, credentials: Object, authorities: List)
+}
+
+class SecurityContextHolder {
+    + getContext() : SecurityContext
+}
+
+class SecurityContext {
+    + setAuthentication(auth: Authentication) : void
+}
+
+@enduml
