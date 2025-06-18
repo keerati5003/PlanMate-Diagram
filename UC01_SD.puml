@@ -1,0 +1,32 @@
+@startuml
+actor User
+participant "Registration Form (UI)" as UI
+participant "Pinia Store\n(auth.ts)" as Store
+participant "Firebase Auth" as Auth
+participant "Firebase Storage" as Storage
+participant "Firestore (via API)" as Backend
+participant "AxiosClient" as API
+
+
+User -> UI : Enter email, password,\ndisplay name, and image
+UI -> Store : signUpWithProfileImage(email,\npassword, displayName, imageFile)
+
+Store -> Auth : createInitialUser(email, password, displayName)
+Auth --> Store : return FirebaseUser (UID)
+
+alt Image file is provided
+    Store -> Storage : uploadBytes(imageFile)
+    Storage --> Store : return imageRef
+    Store -> Storage : getDownloadURL(imageRef)
+    Storage --> Store : return photoURL
+    Store -> Auth : updateUserPhoto(firebaseUser, photoURL)
+end
+
+Store -> Auth : getIdToken(currentUser)
+Auth --> Store : return idToken
+
+Store -> Store : formatUser(auth.currentUser)
+
+Store -> Store : setAuth(user, token)
+Store -> API : GET /ping
+@enduml
