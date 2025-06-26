@@ -1,6 +1,43 @@
 @startuml
 title Entity Class Diagram
 
+enum ExamType {
+    MIDTERM
+    FINAL
+}
+
+class User {
+    - String uid
+    - String email
+}
+
+class Term {
+    - Long termId
+    - String name
+    - LocalDate startDate
+    - LocalDate endDate
+}
+
+class CourseId {
+    - Long termId
+    - String courseCode
+}
+
+class Course {
+    - CourseId courseId
+    - String name
+    - Long credit
+}
+
+class Topic {
+    - String id
+    - String name
+    - Long difficulty
+    - Long confidence
+    - Long estimatedStudyTime
+    - ExamType examType
+}
+
 class Assignment {
     - Long id
     - String name
@@ -9,22 +46,16 @@ class Assignment {
     - Long estimatedTime
 }
 
-class Availability {
+class Exam {
     - Long id
+    - ExamType type
     - LocalDate date
     - String startTime
     - String endTime
 }
 
-class Course {
-    - String id
-    - String name
-    - Long credit
-}
-
-class Exam {
+class Availability {
     - Long id
-    - ExamType type
     - LocalDate date
     - String startTime
     - String endTime
@@ -48,25 +79,13 @@ class StudySession {
     - String topicName
 }
 
-class Term {
-    - Long id
-    - String name
-    - String startDate
-    - String endDate
-}
-
-class Topic {
-    - Long id
-    - String name
-    - Long difficulty
-    - Long confidence
-    - Long estimatedStudyTime
-    - ExamType examType
-}
-
-class User {
-    - String uid
-    - String email
-}
+Term "1" -- "*" Course : contains >
+Course "*" -- "1" Term : belongs to >
+Course "*" -- "*" Topic : has >
+Course "*" -- "*" Assignment : has >
+Course "*" -- "*" Exam : has >
+Topic "*" -- "1" Course : belongs to >
+Term "*" -- "1" User : owned by >
+CourseId <.. Course : embeddedId
 
 @enduml

@@ -6,21 +6,16 @@ class StudyPreferenceController {
     + save(dto: StudyPreferenceDTO) : ResponseEntity<StudyPreferenceDTO>
     + get() : ResponseEntity<StudyPreferenceDTO>
     + update(dto: StudyPreferenceDTO) : ResponseEntity<StudyPreferenceDTO>
-    - getAuthenticatedUid() : String
 }
 
 class StudySetupController {
     - studySetupService : StudySetupService
     + getStudySetup() : ResponseEntity<StudySetupDTO>
     + setupStudyPlan(dto: StudySetupDTO) : ResponseEntity<Void>
-    - getAuthenticatedUid() : String
 }
 
 class UserController {
     + getProfile(request: HttpServletRequest) : ResponseEntity<?>
-}
-
-class UtilController {
     + handlePing() : ResponseEntity<Void>
     + handleLogout(authHeader: String) : ResponseEntity<Void>
 }
@@ -35,4 +30,6 @@ interface StudySetupService {
     + processStudySetup(uid: String, dto: StudySetupDTO) : void
 }
 
+StudyPreferenceController --> StudyPreferenceService
+StudySetupController --> StudySetupService
 @enduml
