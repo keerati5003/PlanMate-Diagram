@@ -1,0 +1,62 @@
+@startuml
+actor User
+participant "Frontend" as Frontend
+participant "AvailabilityController" as Controller
+participant "StudySetupService" as Service
+participant "SecurityUtil" as Security
+participant "UserService" as UserService
+participant "AvailabilityDao" as DAO
+database "Database" as DB
+
+title: Overwrite and Save User Availabilities
+
+User -> Frontend : Selects availability slots and clicks 'Save'
+Frontend -> Controller : POST /availabilities with list of AvailabilityDTOs
+activate Controller
+
+Controller -> Service : saveAvailabilities(availabilityDTOs)
+activate Service
+
+Service -> Security : fetchUser() -> getAuthenticatedUid()
+activate Security
+Security --> Service : userUid
+deactivate Security
+
+Service -> UserService : findByUid(userUid)
+activate UserService
+UserService -> DB: SELECT * FROM users WHERE uid = ?
+activate DB
+DB --> UserService: user record
+deactivate DB
+UserService --> Service : User object
+deactivate UserService
+
+note right of Service : **Crucial Step:** Delete all existing availabilities for this user.
+Service -> DAO : deleteByUser(user)
+activate DAO
+DAO -> DB : DELETE FROM availabilities WHERE user_id = ?
+activate DB
+DB --> DAO : ack
+deactivate DB
+deactivate DAO
+
+loop for each AvailabilityDTO in the incoming list
+    Service -> DAO : save(availability)
+    activate DAO
+    DAO -> DB : INSERT INTO availabilities (...) VALUES (...)
+    activate DB
+    DB --> DAO : saved availability record
+    deactivate DB
+    DAO --> Service : saved Availability entity
+    deactivate DAO
+end
+
+Service --> Controller : List of saved AvailabilityDTOs
+deactivate Service
+
+Controller -> Frontend : 200 OK with the saved list
+deactivate Controller
+
+Frontend -> User : Displays "Availabilities saved successfully"
+
+@enduml

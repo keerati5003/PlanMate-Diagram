@@ -6,4 +6,10 @@ enum ExamType {
     FINAL
 }
 
+enum SessionType {
+    STUDY
+    REVIEW
+    ASSIGNMEN
+}
+
 @enduml

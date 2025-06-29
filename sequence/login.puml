@@ -1,0 +1,47 @@
+@startuml
+actor User
+participant "Frontend (Pinia Store)" as Frontend
+participant "Firebase Auth" as FirebaseAuth
+participant "Backend" as Backend
+participant "SecurityFilter" as SecurityFilter
+participant "SecurityContext" as SecurityContext
+
+title: User Login Flow
+
+User -> Frontend : Enters email and password
+Frontend -> FirebaseAuth : signInWithEmailAndPassword(email, password)
+activate FirebaseAuth
+FirebaseAuth --> Frontend : FirebaseUser
+deactivate FirebaseAuth
+
+Frontend -> FirebaseAuth : getIdToken()
+activate FirebaseAuth
+FirebaseAuth --> Frontend : ID token
+deactivate FirebaseAuth
+
+Frontend -> Frontend : formatUser(firebaseUser) & setAuth(user, token)
+
+Frontend -> Backend : GET /ping with Authorization header
+activate Backend
+
+Backend -> SecurityFilter : intercept request, verify token
+activate SecurityFilter
+
+SecurityFilter -> FirebaseAuth : verifyIdToken()
+activate FirebaseAuth
+FirebaseAuth --> SecurityFilter : FirebaseToken
+deactivate FirebaseAuth
+
+SecurityFilter -> FirebaseAuth : getUser(uid)
+activate FirebaseAuth
+FirebaseAuth --> SecurityFilter : UserRecord
+deactivate FirebaseAuth
+
+SecurityFilter -> SecurityContext : set Authentication
+activate SecurityContext
+deactivate SecurityContext
+
+deactivate SecurityFilter
+Backend --> Frontend : 200 OK
+deactivate Backend
+@enduml

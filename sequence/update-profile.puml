@@ -1,0 +1,27 @@
+@startuml
+actor User
+participant "Frontend (Profile Page)" as Frontend
+participant "Firebase Auth" as FirebaseAuth
+participant "Firebase Storage" as FirebaseStorage
+participant "Local Store (Pinia)" as PiniaStore
+
+User -> Frontend : Enters new display name and/or selects new image file
+User -> Frontend : Clicks "Save Changes"
+
+alt if a new image file was selected
+    Frontend -> FirebaseStorage : uploadBytes(imageFile)
+    activate FirebaseStorage
+    FirebaseStorage --> Frontend : newImageURL
+    deactivate FirebaseStorage
+end
+
+Frontend -> FirebaseAuth : updateProfile(currentUser, { ...updateData })
+activate FirebaseAuth
+FirebaseAuth --> Frontend : Success confirmation
+deactivate FirebaseAuth
+
+Frontend -> PiniaStore : Update user state with new name/image URL
+
+Frontend -> User : Displays "Profile updated successfully" message
+
+@enduml

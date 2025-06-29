@@ -1,0 +1,70 @@
+@startuml
+actor User
+participant "Frontend (UI)" as Frontend
+participant "BackendController" as Controller
+participant "PreferenceService" as Service
+participant "SecurityUtil" as Security
+participant "UserService" as UserService
+participant "StudyPreferenceDao" as DAO
+participant "StudyPreferenceRepository" as Repository
+database "Database" as DB
+
+User -> Frontend : Fills & Submits Form
+Frontend -> Controller : POST /api/study-preferences
+activate Controller
+
+Controller -> Service : saveOrUpdate(StudyPreferenceDTO)
+activate Service
+
+Service -> Security : getAuthenticatedUid()
+activate Security
+Security --> Service : userUid
+deactivate Security
+
+Service -> UserService : findByUid(userUid)
+activate UserService
+UserService -> DB: Fetches user record
+activate DB
+DB --> UserService: Returns user data
+deactivate DB
+UserService --> Service : User
+deactivate UserService
+
+Service -> DAO : findByUserUid(userUid)
+activate DAO
+DAO -> DB : Searches for preference record
+activate DB
+DB --> DAO : Returns existing preference (or nothing)
+deactivate DB
+DAO --> Service : Optional<StudyPreference>
+deactivate DAO
+
+alt Optional is Present
+    Service -> Service : updateFields(existing, dto)
+else Optional is Empty
+    Service -> Service : mapper.toStudyPreference(dto, user)
+end
+
+Service -> DAO : savePreference(preference)
+activate DAO
+DAO -> Repository : save(preference)
+activate Repository
+Repository -> DB : INSERT/UPDATE study_preference
+activate DB
+DB --> Repository : persisted record
+deactivate DB
+Repository --> DAO : StudyPreference (saved)
+deactivate Repository
+DAO --> Service : StudyPreference (saved)
+deactivate DAO
+
+Service -> Service : mapper.toStudyPreferenceDto(saved)
+Service --> Controller : StudyPreferenceDTO (saved)
+deactivate Service
+
+Controller --> Frontend : ResponseEntity.ok(savedDto)
+deactivate Controller
+
+Frontend -> User : Displays Success
+
+@enduml

@@ -1,79 +1,6 @@
 @startuml
-skinparam dpi 150
-skinparam classAttributeIconSize 0
-skinparam linetype ortho
-title Service and Implementation Overview (Using DAO)
-
-interface UserService {
-  + save(user: User): User
-  + findByUid(uid: String): User
-}
-class UserServiceImpl {
-  - userDao: UserDao
-  + save(user: User): User
-  + findByUid(uid: String): User
-}
-
-interface TopicService {
-  + save(topic: Topic): void
-  + saveAll(topics: List<Topic>): void
-}
-class TopicServiceImpl {
-  - topicDao: TopicDao
-  + save(topic: Topic): void
-  + saveAll(topics: List<Topic>): void
-}
-
-interface TermService {
-  + save(term: Term): void
-}
-class TermServiceImpl {
-  - termDao: TermDao
-  + save(term: Term): void
-}
-
-interface StudySetupService {
-  + processStudySetup(userUid: String, dto: StudySetupDTO): void
-  + getStudySetup(userUid: String): StudySetupDTO
-}
-class StudySetupServiceImpl {
-  - userDao: UserDao
-  - courseDao: CourseDao
-  - topicDao: TopicDao
-  - examDao: ExamDao
-  - assignmentDao: AssignmentDao
-  - availabilityDao: AvailabilityDao
-  + processStudySetup(userUid: String, dto: StudySetupDTO): void
-  + getStudySetup(userUid: String): StudySetupDTO
-}
-
-interface StudyPreferenceService {
-  + getPreference(userUid: String): Optional<StudyPreferenceDTO>
-  + saveOrUpdate(userUid: String, dto: StudyPreferenceDTO): StudyPreferenceDTO
-}
-class StudyPreferenceServiceImpl {
-  - studyPreferenceDao: StudyPreferenceDao
-  - studyPreferenceMapper: StudyPreferenceMapper
-  + getPreference(userUid: String): Optional<StudyPreferenceDTO>
-  + saveOrUpdate(userUid: String, dto: StudyPreferenceDTO): StudyPreferenceDTO
-}
-
-interface ExamService {
-  + save(exam: Exam): void
-  + saveAll(exams: List<Exam>): void
-}
-class ExamServiceImpl {
-  - examDao: ExamDao
-  + save(exam: Exam): void
-  + saveAll(exams: List<Exam>): void
-}
 
 interface CourseService {
-  + save(course: Course): void
-  + saveAll(courses: List<Course>): void
-}
-class CourseServiceImpl {
-  - courseDao: CourseDao
   + save(course: Course): void
   + saveAll(courses: List<Course>): void
 }
@@ -82,21 +9,111 @@ interface AvailabilityService {
   + save(availability: Availability): void
   + saveAll(availabilities: List<Availability>): void
 }
-class AvailabilityServiceImpl {
-  - availabilityDao: AvailabilityDao
-  + save(availability: Availability): void
-  + saveAll(availabilities: List<Availability>): void
-}
 
 interface AssignmentService {
   + save(assignment: Assignment): void
   + saveAll(assignments: List<Assignment>): void
 }
+
+interface ScheduleService {
+  + getScheduleForUser(): ScheduleDTO
+  + saveSchedule(dto: ScheduleDTO): void
+  + generateScheduleFromFastAPI(setupDTO: StudySetupDTO): ScheduleDTO
+}
+
+'================ Implementations ==================
+class CourseServiceImpl {
+  - courseDao: CourseDao
+}
+
+class AvailabilityServiceImpl {
+  - availabilityDao: AvailabilityDao
+}
+
 class AssignmentServiceImpl {
   - assignmentDao: AssignmentDao
-  + save(assignment: Assignment): void
-  + saveAll(assignments: List<Assignment>): void
 }
+
+class ScheduleServiceImpl {
+  - scheduleDao: ScheduleDao
+  - userDao: UserDao
+  - courseDao: CourseDao
+  - topicDao: TopicDao
+  - assignmentDao: AssignmentDao
+  - studyPreferenceDao: StudyPreferenceDao
+  - mapper: DTOMapper
+}
+
+'================ Relationships ==================
+CourseServiceImpl ..|> CourseService
+AvailabilityServiceImpl ..|> AvailabilityService
+AssignmentServiceImpl ..|> AssignmentService
+ScheduleServiceImpl ..|> ScheduleService
+
+@enduml
+
+@startuml
+
+'================ Interfaces ==================
+interface UserService {
+  + save(user: User): User
+  + findByUid(uid: String): User
+}
+
+interface TopicService {
+  + save(topic: Topic): void
+  + saveAll(topics: List<Topic>): void
+}
+
+interface TermService {
+  + save(term: Term): void
+}
+
+interface StudySetupService {
+  + processStudySetup(userUid: String, dto: StudySetupDTO): void
+  + getStudySetup(userUid: String): StudySetupDTO
+}
+
+interface StudyPreferenceService {
+  + getPreference(userUid: String): StudyPreferenceDTO
+  + saveOrUpdate(userUid: String, dto: StudyPreferenceDTO): StudyPreferenceDTO
+}
+
+interface ExamService {
+  + save(exam: Exam): void
+  + saveAll(exams: List<Exam>): void
+}
+
+class UserServiceImpl {
+  - userDao: UserDao
+}
+
+class TopicServiceImpl {
+  - topicDao: TopicDao
+}
+
+class TermServiceImpl {
+  - termDao: TermDao
+}
+
+class StudySetupServiceImpl {
+  - userDao: UserDao
+  - courseDao: CourseDao
+  - topicDao: TopicDao
+  - examDao: ExamDao
+  - assignmentDao: AssignmentDao
+  - availabilityDao: AvailabilityDao
+}
+
+class StudyPreferenceServiceImpl {
+  - studyPreferenceDao: StudyPreferenceDao
+  - studyPreferenceMapper: StudyPreferenceMapper
+}
+
+class ExamServiceImpl {
+  - examDao: ExamDao
+}
+
 
 UserServiceImpl ..|> UserService
 TopicServiceImpl ..|> TopicService
@@ -104,8 +121,5 @@ TermServiceImpl ..|> TermService
 StudySetupServiceImpl ..|> StudySetupService
 StudyPreferenceServiceImpl ..|> StudyPreferenceService
 ExamServiceImpl ..|> ExamService
-CourseServiceImpl ..|> CourseService
-AvailabilityServiceImpl ..|> AvailabilityService
-AssignmentServiceImpl ..|> AssignmentService
 
 @enduml

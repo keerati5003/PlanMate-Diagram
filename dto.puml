@@ -1,11 +1,6 @@
 @startuml
 title DTO Class Diagram
 
-enum ExamType {
-    MIDTERM
-    FINAL
-}
-
 class TermRequestDTO {
     - String name
     - String startDate
@@ -17,7 +12,7 @@ class TermResponseDTO {
     - String name
     - String startDate
     - String endDate
-    - List<CourseResponseDTO> courses
+    - List<CourseDTO> courses
 }
 
 class CourseBaseDTO {
@@ -26,16 +21,11 @@ class CourseBaseDTO {
     - Long credit
 }
 
-class CourseResponseDTO {
-    - CourseId courseId
+class CourseDTO {
+    - Long courseId
     - List<TopicDTO> topics
     - List<AssignmentDTO> assignments
     - List<ExamDTO> exams
-}
-
-class CourseId {
-    - Long termId
-    - String courseCode
 }
 
 class TopicDTO {
@@ -47,18 +37,22 @@ class TopicDTO {
 }
 
 class AssignmentDTO {
+    - String id
     - String name
     - LocalDate dueDate
-    - String dueTime
+    - LocalTime dueTime
     - Long estimatedTime
-    - List<String> associatedTopicTitles
+    - List<String> associatedTopicIds
+    - ExamType examType
+    - Boolean isCompleted
 }
 
 class ExamDTO {
+    - String id
     - ExamType type
     - LocalDate date
-    - String startTime
-    - String endTime
+    - LocalTime startTime
+    - LocalTime endTime
 }
 
 class StudyPreferenceDTO {
@@ -72,39 +66,55 @@ class StudyPreferenceDTO {
 
 class AvailabilityDTO {
     - LocalDate date
-    - String startTime
-    - String endTime
+    - LocalTime startTime
+    - LocalTime endTime
 }
 
-class AIPlanRequestDTO {
+class GeneratePlanRequestDTO {
     - StudyPreferenceDTO studyPreference
-    - List<AvailabilityDTO> availabilities
-    - List<CourseDTO> courses
-    - List<TopicDTO> topics
-    - List<AssignmentDTO> assignments
-    - List<ExamDTO> exams
+    - StudySetupDTO studySetup
 }
 
 class StudySetupDTO {
-    - String userUid
-    - TermDTO term
+    - TermResponseDTO term
     - List<AvailabilityDTO> availabilities
 }
 
-class TermDTO {
-    - String name
-    - String startDate
-    - String endDate
-    - List<CourseDTO> courses
+class SessionDTO {
+    - String sessionId
+    - Long courseId
+    - Long duration
+    - SessionType type
+    - LocalDate date
+    - LocalTime start
+    - LocalTime end
+    - Boolean isScheduled
+    - String topicId
+    - String assignmentId
 }
 
-class CourseDTO {
-    - String id
-    - String name
-    - Long credit
-    - List<TopicDTO> topics
-    - List<AssignmentDTO> assignments
-    - List<ExamDTO> exams
+class ScheduleDTO {
+    - List<SessionDTO> study_plan
+    - List<SessionDTO> unscheduled_plan
+}
+
+class SessionViewDTO {
+    - String sessionId
+    - String courseCode
+    - String topicName
+    - String assignmentName
+    - LocalDate date
+    - LocalTime start
+    - LocalTime end
+    - Long duration
+    - SessionType type
+    - Boolean isScheduled
+    - Boolean isCompleted
+}
+
+class ScheduleViewDTO {
+    - List<SessionViewDTO> studyPlan;
+    - List<SessionViewDTO> unscheduledPlan;
 }
 
 CourseResponseDTO --|> CourseBaseDTO

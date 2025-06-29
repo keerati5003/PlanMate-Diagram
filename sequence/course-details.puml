@@ -1,0 +1,133 @@
+@startuml
+actor User
+participant "Frontend" as Frontend
+participant "CourseController" as Controller
+participant "StudySetupService" as Service
+participant "SecurityUtil" as Security
+participant "CourseDao" as CourseDao
+database "Database" as DB
+
+title: Deep Update of Course Details (with Database)
+
+User -> Frontend : Edits course details, topics, exams, etc. and clicks 'Save'
+Frontend -> Controller : PUT /courses/details with CourseResponseDTO
+activate Controller
+
+Controller -> Service : updateCourseDetails(details)
+activate Service
+
+Service -> CourseDao : findById(details.getCourseId())
+activate CourseDao
+CourseDao -> DB : SELECT * FROM courses WHERE id=?
+activate DB
+DB --> CourseDao : course record
+deactivate DB
+CourseDao --> Service : Course object
+deactivate CourseDao
+note right: Fetches the primary course entity to be updated.
+
+Service -> Security : getAuthenticatedUid()
+activate Security
+Security --> Service : userUid
+deactivate Security
+note right: Security Check: Verifies user owns the course.
+
+ref over Service : Synchronize Topics, Exams, and Assignments
+note left
+ The service now calls its private helper methods
+ (`saveTopics`, `saveExams`, `saveAssignments`)
+ to perform the detailed create, update, and delete
+ operations for each child entity.
+end note
+
+Service -> CourseDao : flush()
+activate CourseDao
+CourseDao -> DB : FLUSH (sends all pending SQL statements)
+activate DB
+DB --> CourseDao
+deactivate DB
+deactivate CourseDao
+note right: Forces all changes to the database.
+
+Service -> CourseDao : findById(details.getCourseId())
+activate CourseDao
+CourseDao -> DB : SELECT * FROM courses WHERE id=?
+activate DB
+DB --> CourseDao : reloaded course record
+deactivate DB
+CourseDao --> Service : reloaded Course object
+deactivate CourseDao
+note right: Reloads the course to get a fresh state for the response.
+
+Service -> Service : mapper.toCourseResponseDto(updatedCourse)
+Service --> Controller : CourseResponseDTO
+deactivate Service
+
+Controller -> Frontend : 200 OK with updated course details
+deactivate Controller
+
+@enduml
+
+@startuml
+actor User
+participant "Frontend" as Frontend
+participant "CourseController" as Controller
+participant "StudySetupService" as Service
+participant "SecurityUtil" as Security
+participant "CourseDao" as CourseDao
+database "Database" as DB
+
+User -> Frontend : Edits course details (topics, exams, assignment) and clicks 'Save'
+Frontend -> Controller : PUT /courses/details with CourseResponseDTO
+activate Controller
+
+Controller -> Service : updateCourseDetails(details)
+activate Service
+
+Service -> CourseDao : findById(details.getCourseId())
+activate CourseDao
+CourseDao -> DB : SELECT * FROM courses WHERE id=?
+activate DB
+DB --> CourseDao : course record
+deactivate DB
+CourseDao --> Service : Course object
+deactivate CourseDao
+note right: Fetches the primary course entity to be updated.
+
+Service -> Security : getAuthenticatedUid()
+activate Security
+Security --> Service : userUid
+deactivate Security
+note right: Verifies user owns the course.
+
+ref over Service : Synchronize Topics, Exams, and Assignments
+
+Service -> CourseDao : flush()
+activate CourseDao
+CourseDao -> DB : FLUSH (sends all pending SQL statements)
+activate DB
+DB --> CourseDao
+deactivate DB
+deactivate CourseDao
+note right: Forces all changes to the database.
+
+Service -> CourseDao : findById(details.getCourseId())
+activate CourseDao
+CourseDao -> DB : SELECT * FROM courses WHERE id=?
+activate DB
+DB --> CourseDao : reloaded course record
+deactivate DB
+CourseDao --> Service : reloaded Course object
+deactivate CourseDao
+note right: Reloads the course to get a fresh state for the response.
+
+Service -> Service : mapper.toCourseResponseDto(updatedCourse)
+Service --> Controller : CourseResponseDTO
+deactivate Service
+
+Controller -> Frontend : 200 OK with updated course details
+deactivate Controller
+
+Frontend --> User : Show saved course details
+
+@enduml

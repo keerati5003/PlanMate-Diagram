@@ -7,6 +7,7 @@ interface AssignmentRepository {
 
 interface AvailabilityRepository {
     + findByUser(user: User) : List<Availability>
+    + deleteByUser(user: User) : void
 }
 
 interface CourseRepository {
@@ -23,6 +24,7 @@ interface StudyPreferenceRepository {
 
 interface TermRepository {
     + findByUser(user: User) : Term
+    + findCurrentTerm(user: User) : Optional<Term>
 }
 
 interface TopicRepository {

@@ -1,0 +1,60 @@
+@startuml
+actor User
+participant "Frontend" as Frontend
+participant "TermController" as Controller
+participant "StudySetupService" as Service
+participant "SecurityUtil" as Security
+participant "UserService" as UserService
+participant "TermDao" as DAO
+participant "TermRepository" as Repository
+database "Database" as DB
+
+User -> Frontend : Fills out and submits the new term form
+
+Frontend -> Controller : POST /terms with TermRequestDTO
+activate Controller
+
+Controller -> Service : saveTerm(termDTO)
+activate Service
+
+Service -> Security : fetchUser() -> getAuthenticatedUid()
+activate Security
+Security --> Service : userUid
+deactivate Security
+
+Service -> UserService : findByUid(userUid)
+activate UserService
+UserService -> DB: SELECT * FROM users WHERE uid = ?
+activate DB
+DB --> UserService: user record
+deactivate DB
+UserService --> Service : User object
+deactivate UserService
+
+Service -> Service : mapper.toTerm(dto, user)
+Service -> Service : term.setCourses(new ArrayList<>())
+
+Service -> DAO : save(term)
+activate DAO
+DAO -> Repository : save(term)
+activate Repository
+
+Repository -> DB : INSERT INTO terms (...) VALUES (...)
+activate DB
+DB --> Repository : persisted term record
+deactivate DB
+Repository --> DAO : Term (saved entity)
+deactivate Repository
+DAO --> Service : Term (saved entity)
+deactivate DAO
+
+Service -> Service : mapper.toTermDto(savedTerm)
+Service --> Controller : TermResponseDTO
+deactivate Service
+
+Controller --> Frontend : 201 Created with TermResponseDTO
+deactivate Controller
+
+Frontend -> User : Displays "Term Created" success message
+
+@enduml

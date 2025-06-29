@@ -1,0 +1,65 @@
+@startuml
+actor User
+participant "Frontend (Pinia Store)" as Frontend
+participant "Firebase Auth" as FirebaseAuth
+participant "Firebase Storage" as FirebaseStorage
+participant "Backend" as Backend
+participant "SecurityFilter" as SecurityFilter
+participant "SecurityContext" as SecurityContext
+
+title: New User Registration Flow
+
+User -> Frontend : Enters email, password, displayName, imageFile
+
+Frontend -> FirebaseAuth : createUserWithEmailAndPassword()
+activate FirebaseAuth
+FirebaseAuth --> Frontend : FirebaseUser
+deactivate FirebaseAuth
+
+Frontend -> FirebaseAuth : updateProfile(displayName)
+activate FirebaseAuth
+deactivate FirebaseAuth
+
+
+alt if imageFile provided
+  Frontend -> FirebaseStorage : uploadBytes(imageFile)
+  activate FirebaseStorage
+  FirebaseStorage --> Frontend : image URL
+  deactivate FirebaseStorage
+
+  Frontend -> FirebaseAuth : updateProfile(photoURL)
+  activate FirebaseAuth
+  deactivate FirebaseAuth
+end
+
+Frontend -> FirebaseAuth : getIdToken()
+activate FirebaseAuth
+FirebaseAuth --> Frontend : ID token
+deactivate FirebaseAuth
+
+Frontend -> Frontend : formatUser(firebaseUser) & setAuth(user, token)
+
+Frontend -> Backend : GET /ping with Authorization header
+activate Backend
+
+Backend -> SecurityFilter : intercept request, verify token
+activate SecurityFilter
+
+SecurityFilter -> FirebaseAuth : verifyIdToken()
+activate FirebaseAuth
+FirebaseAuth --> SecurityFilter : FirebaseToken
+deactivate FirebaseAuth
+
+SecurityFilter -> FirebaseAuth : getUser(uid)
+activate FirebaseAuth
+FirebaseAuth --> SecurityFilter : UserRecord
+deactivate FirebaseAuth
+
+SecurityFilter -> SecurityContext : set Authentication
+activate SecurityContext
+deactivate SecurityContext
+
+deactivate SecurityFilter
+Backend --> Frontend : 200 OK
+deactivate Backend
+@enduml

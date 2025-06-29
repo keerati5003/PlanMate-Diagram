@@ -1,0 +1,109 @@
+@startuml
+actor User
+participant "Frontend" as Frontend
+participant "CourseController" as Controller
+participant "StudySetupService" as Service
+participant "SecurityUtil" as Security
+participant "TermDao" as TermDao
+participant "CourseDao" as CourseDao
+participant "TopicDao" as TopicDao
+participant "AssignmentDao" as AssignmentDao
+participant "ExamDao" as ExamDao
+database "Database" as DB
+
+User -> Frontend : Define course info with courseCode, name,and credit
+Frontend -> Controller : PUT /terms/{termId}/courses \nwith list of course DTOs
+activate Controller
+
+Controller -> Service : saveAllCourses(termId, courseDTOs)
+activate Service
+
+Service -> TermDao : findById(termId)
+activate TermDao
+TermDao -> DB : SELECT * FROM terms WHERE id=?
+activate DB
+DB --> TermDao : term record
+deactivate DB
+TermDao --> Service : Term object
+deactivate TermDao
+
+Service -> Security : getAuthenticatedUid()
+activate Security
+Security --> Service : userUid
+deactivate Security
+
+Service -> CourseDao : findByTerm(term)
+activate CourseDao
+CourseDao -> DB : SELECT * FROM courses WHERE term_id=?
+activate DB
+DB --> CourseDao : list of existing courses
+deactivate DB
+CourseDao --> Service : existingCoursesInTerm
+deactivate CourseDao
+
+loop for each course DTO in the incoming list
+
+    alt courseId is provided (potential update)
+        Service -> CourseDao : findById(courseDTO.getCourseId())
+        activate CourseDao
+        CourseDao -> DB : SELECT * FROM courses WHERE id=?
+        activate DB
+        DB --> CourseDao : course (or null)
+        deactivate DB
+        CourseDao --> Service : course (or null)
+        deactivate CourseDao
+
+        alt course was found
+            Service -> Service : mapper.updateCourseFromDto(dto, course)
+        else course not found (stale ID)
+            Service -> Service : mapper.toCourse(dto, term)
+            note right: A new course entity is created
+        end
+    else courseId is null (new course)
+        Service -> Service : mapper.toCourse(dto, term)
+    end
+
+    Service -> CourseDao : save(course)
+    activate CourseDao
+    CourseDao -> DB : INSERT or UPDATE courses table
+    activate DB
+    DB --> CourseDao : saved course record
+    deactivate DB
+    CourseDao --> Service : savedCourse entity
+    deactivate CourseDao
+
+    Service -> TopicDao : findByCourse(savedCourse)
+    activate TopicDao
+    TopicDao -> DB : SELECT * FROM topics...
+    activate DB
+    DB --> TopicDao
+    deactivate DB
+    deactivate TopicDao
+    
+    Service -> AssignmentDao : findByCourse(savedCourse)
+    activate AssignmentDao
+    AssignmentDao -> DB : SELECT * FROM assignments...
+    activate DB
+    DB --> AssignmentDao
+    deactivate DB
+    deactivate AssignmentDao
+    
+    Service -> ExamDao : findByCourse(savedCourse)
+    activate ExamDao
+    ExamDao -> DB : SELECT * FROM exams...
+    activate DB
+    DB --> ExamDao
+    deactivate DB
+    deactivate ExamDao
+end
+
+Service -> Service : mapper.toCourseResponseDtoList(savedCourses)
+Service --> Controller : List<CourseResponseDTO>
+deactivate Service
+
+Controller --> Frontend : 200 OK with list of saved courses
+deactivate Controller
+
+Frontend -> User : Displays success message with course details
+
+@enduml

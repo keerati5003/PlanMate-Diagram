@@ -18,13 +18,9 @@ class Term {
     - LocalDate endDate
 }
 
-class CourseId {
-    - Long termId
-    - String courseCode
-}
-
 class Course {
-    - CourseId courseId
+    - Long courseId
+    - String courseCode
     - String name
     - Long credit
 }
@@ -42,23 +38,24 @@ class Assignment {
     - Long id
     - String name
     - LocalDate dueDate
-    - String dueTime
+    - LocalTime dueTime
     - Long estimatedTime
+    - Boolean isCompleted
 }
 
 class Exam {
-    - Long id
+    - String id
     - ExamType type
     - LocalDate date
-    - String startTime
-    - String endTime
+    - LocalTime startTime
+    - LocalTime endTime
 }
 
 class Availability {
     - Long id
     - LocalDate date
-    - String startTime
-    - String endTime
+    - LocalTime startTime
+    - LocalTime endTime
 }
 
 class StudyPreference {
@@ -70,22 +67,20 @@ class StudyPreference {
     - Integer breakDurations
 }
 
-class StudySession {
-    - Long id
-    - String date
-    - String startTime
-    - String endTime
-    - String sessionType
-    - String topicName
+class Session {
+    - Sring sessionId
+    - LocalDate date
+    - LocalTime start
+    - LocalTime end
+    - Long duration
+    - Boolean isCompleted
+    - SessionType type
 }
 
-Term "1" -- "*" Course : contains >
-Course "*" -- "1" Term : belongs to >
-Course "*" -- "*" Topic : has >
-Course "*" -- "*" Assignment : has >
-Course "*" -- "*" Exam : has >
-Topic "*" -- "1" Course : belongs to >
-Term "*" -- "1" User : owned by >
-CourseId <.. Course : embeddedId
+class Schedule {
+    - Long id
+    - String generatedAt
+    - ExamType examType
+}
 
 @enduml
