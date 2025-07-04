@@ -1,5 +1,47 @@
+' @startuml
+' title Controller Layer Class Diagram
+
+' class StudyPreferenceController {
+'     - preferenceService : StudyPreferenceService
+'     + save(dto: StudyPreferenceDTO) : ResponseEntity<StudyPreferenceDTO>
+'     + get() : ResponseEntity<StudyPreferenceDTO>
+'     + update(dto: StudyPreferenceDTO) : ResponseEntity<StudyPreferenceDTO>
+' }
+
+' class StudySetupController {
+'     - studySetupService : StudySetupService
+'     + getStudySetup() : ResponseEntity<StudySetupDTO>
+'     + setupStudyPlan(dto: StudySetupDTO) : ResponseEntity<Void>
+' }
+
+' class UserController {
+'     + getProfile(request: HttpServletRequest) : ResponseEntity<?>
+'     + handlePing() : ResponseEntity<Void>
+'     + handleLogout(authHeader: String) : ResponseEntity<Void>
+' }
+
+' interface StudyPreferenceService {
+'     + saveOrUpdate(uid: String, dto: StudyPreferenceDTO) : StudyPreferenceDTO
+'     + getPreference(uid: String) : Optional<StudyPreferenceDTO>
+' }
+
+' interface StudySetupService {
+'     + getStudySetup(uid: String) : StudySetupDTO
+'     + processStudySetup(uid: String, dto: StudySetupDTO) : void
+' }
+
+' StudyPreferenceController --> StudyPreferenceService
+' StudySetupController --> StudySetupService
+' @enduml
+
 @startuml
-title Controller Layer Class Diagram
+title UML Class Diagram - Controller Layer (No Packages)
+
+class UserController {
+    + getProfile(request: HttpServletRequest) : ResponseEntity<?>
+    + handlePing() : ResponseEntity<Void>
+    + handleLogout(authHeader: String) : ResponseEntity<Void>
+}
 
 class StudyPreferenceController {
     - preferenceService : StudyPreferenceService
@@ -10,26 +52,25 @@ class StudyPreferenceController {
 
 class StudySetupController {
     - studySetupService : StudySetupService
-    + getStudySetup() : ResponseEntity<StudySetupDTO>
     + setupStudyPlan(dto: StudySetupDTO) : ResponseEntity<Void>
+    + getStudySetup() : ResponseEntity<StudySetupDTO>
+    + getCurrentTerm() : ResponseEntity<TermResponseDTO>
+    + createTerm(termDTO: TermRequestDTO) : ResponseEntity<TermResponseDTO>
+    + updateTerm(termId: Long, request: TermRequestDTO) : ResponseEntity<TermResponseDTO>
+    + saveAllCourses(termId: Long, course: List<CourseResponseDTO>) : ResponseEntity<List<CourseResponseDTO>>
+    + deleteCourse(courseId: Long) : ResponseEntity<Void>
+    + updateCourseDetails(details: CourseResponseDTO) : ResponseEntity<CourseResponseDTO>
+    + getAvailabilities() : ResponseEntity<List<AvailabilityDTO>>
+    + saveAvailabilities(availabilityList: List<AvailabilityRequestDTO>) : ResponseEntity<List<AvailabilityDTO>>
 }
 
-class UserController {
-    + getProfile(request: HttpServletRequest) : ResponseEntity<?>
-    + handlePing() : ResponseEntity<Void>
-    + handleLogout(authHeader: String) : ResponseEntity<Void>
+class ScheduleController {
+    - scheduleService : ScheduleService
+    - studySetupService : StudySetupService
+    + getSchedule() : ResponseEntity<ScheduleDTO>
+    + saveSchedule(dto: ScheduleDTO) : ResponseEntity<ScheduleDTO>
+    + updateSchedule(dto: ScheduleDTO) : ResponseEntity<ScheduleDTO>
+    + generateScheduleFromFastAPI() : ResponseEntity<ScheduleDTO>
 }
 
-interface StudyPreferenceService {
-    + saveOrUpdate(uid: String, dto: StudyPreferenceDTO) : StudyPreferenceDTO
-    + getPreference(uid: String) : Optional<StudyPreferenceDTO>
-}
-
-interface StudySetupService {
-    + getStudySetup(uid: String) : StudySetupDTO
-    + processStudySetup(uid: String, dto: StudySetupDTO) : void
-}
-
-StudyPreferenceController --> StudyPreferenceService
-StudySetupController --> StudySetupService
 @enduml
