@@ -1,0 +1,28 @@
+@startuml
+actor User
+participant "Frontend" as Frontend
+participant "ScheduleController" as Controller
+participant "ScheduleService" as ScheduleService
+participant "StudySetupService" as SetupService
+participant "StudyPreferenceService" as PrefService
+participant "FastAPI Service" as FastAPI
+
+    User -> Frontend : Clicks "Accept & Save Plan" button
+    activate Frontend
+
+    Frontend -> Controller : POST /schedules with schedule data
+    activate Controller
+
+    Controller -> ScheduleService : saveSchedule(scheduleData)
+    activate ScheduleService
+    note right of ScheduleService : Persists the final plan (details abstracted).
+    ScheduleService --> Controller : returns saved Schedule object
+    deactivate ScheduleService
+
+    Controller -> Frontend : 201 Created
+    deactivate Controller
+
+    Frontend -> User : Shows "Plan Saved Successfully!"
+    deactivate Frontend
+
+@enduml

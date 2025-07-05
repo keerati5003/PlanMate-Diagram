@@ -10,6 +10,8 @@ participant "StudyPreferenceRepository" as Repository
 database "Database" as DB
 
 User -> Frontend : Fills & Submits Form
+activate User
+activate Frontend
 Frontend -> Controller : POST /api/study-preferences
 activate Controller
 
@@ -66,5 +68,6 @@ Controller --> Frontend : ResponseEntity.ok(savedDto)
 deactivate Controller
 
 Frontend -> User : Displays Success
-
+deactivate Frontend
+deactivate User
 @enduml

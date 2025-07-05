@@ -7,9 +7,9 @@ participant "Backend" as Backend
 participant "SecurityFilter" as SecurityFilter
 participant "SecurityContext" as SecurityContext
 
-title: New User Registration Flow
-
 User -> Frontend : Enters email, password, displayName, imageFile
+activate User
+activate Frontend
 
 Frontend -> FirebaseAuth : createUserWithEmailAndPassword()
 activate FirebaseAuth
@@ -62,4 +62,7 @@ deactivate SecurityContext
 deactivate SecurityFilter
 Backend --> Frontend : 200 OK
 deactivate Backend
+Frontend --> User : Registration Complete
+deactivate Frontend
+deactivate User
 @enduml

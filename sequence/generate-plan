@@ -1,0 +1,58 @@
+@startuml
+actor User
+participant "Frontend" as Frontend
+participant "ScheduleController" as Controller
+participant "ScheduleService" as ScheduleService
+participant "StudySetupService" as SetupService
+participant "StudyPreferenceService" as PrefService
+participant "FastAPI Service" as FastAPI
+
+User -> Frontend : Clicks "Generate Study Plan" button
+activate User
+activate Frontend
+
+Frontend -> Controller : POST /schedule/generate
+activate Controller
+
+Controller -> ScheduleService : generateScheduleFromFastAPI()
+activate ScheduleService
+
+' First call to get the setup
+ScheduleService -> SetupService : getStudySetup()
+activate SetupService
+SetupService --> ScheduleService : StudySetupDTO
+deactivate SetupService
+
+' Second call to get the preferences
+ScheduleService -> PrefService : getPreferences()
+activate PrefService
+PrefService --> ScheduleService : StudyPreferenceDTO
+deactivate PrefService
+
+alt if StudySetup or StudyPreference is missing
+    ScheduleService --> Controller : throws MissingDataException
+    deactivate ScheduleService
+    Controller --> Frontend : 400 Bad Request with details
+    deactivate Controller
+    Frontend -> User : Shows error: "Please complete your setup & preferences first."
+    deactivate Frontend
+else all data is complete
+    ScheduleService -> FastAPI : POST /api/generate-plan/
+    activate ScheduleService
+    activate FastAPI
+    FastAPI --> ScheduleService : Generated ScheduleDTO (unsaved)
+    deactivate FastAPI
+
+    ScheduleService --> Controller : returns generated ScheduleDTO
+    deactivate ScheduleService
+
+    activate Controller 
+    Controller --> Frontend : 200 OK with preview schedule
+    deactivate Controller
+
+    activate Frontend
+    Frontend -> User : Displays the generated plan with "Accept & Save Plan" button
+    deactivate Frontend
+deactivate User
+end
+@enduml
