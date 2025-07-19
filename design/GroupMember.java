@@ -1,20 +1,14 @@
 @Entity
 @Table(name = "group_members")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class GroupMember {
     @Id
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "group_id")
-    private StudyGroup group;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
     private User user;
 
-    private Timestamp joinedAt;
+    @ManyToOne
+    private StudyGroup group;
 }

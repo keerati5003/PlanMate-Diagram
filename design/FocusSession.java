@@ -1,26 +1,22 @@
 @Entity
 @Table(name = "focus_sessions")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class FocusSession {
     @Id
-    private UUID sessionId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "group_id", nullable = true)
-    private StudyGroup group;
+    private StudySession session;
 
-    private Timestamp startTime;
+    private LocalDateTime startedAt;
+    private LocalDateTime endedAt;
 
-    private Timestamp endTime;
+    private Boolean isShared;
 
-    private Integer durationMinutes;
-
-    private Boolean isCompleted;
+    @ManyToOne
+    private FocusSession sharedParent; // ถ้า join กับ session ของเพื่อน
 }

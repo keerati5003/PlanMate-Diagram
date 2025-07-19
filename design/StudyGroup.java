@@ -1,17 +1,16 @@
 @Entity
 @Table(name = "study_groups")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class StudyGroup {
     @Id
-    private UUID groupId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    private String groupName;
+    private String name;
 
     @Column(unique = true)
-    private String groupCode;
+    private String joinCode;
 
-    private Timestamp createdAt;
+    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
+    private List<GroupMember> members;
 }
