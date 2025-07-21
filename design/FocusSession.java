@@ -5,17 +5,17 @@ public class FocusSession {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
+    private LocalDateTime startedAt;
+    private LocalDateTime endedAt;
+
+    private Boolean isShared;
 
     @ManyToOne
     private User user;
 
     @ManyToOne
     private StudySession session;
-
-    private LocalDateTime startedAt;
-    private LocalDateTime endedAt;
-
-    private Boolean isShared;
 
     @ManyToOne
     private FocusSession sharedParent; // ถ้า join กับ session ของเพื่อน
