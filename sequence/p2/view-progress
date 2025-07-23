@@ -1,0 +1,73 @@
+@startuml
+actor Student
+participant "Frontend" as FE
+participant "StudyGroupController" as C
+participant "StudyGroupService" as S
+participant "GroupMemberDao" as GMD
+participant "FirebaseService" as FS
+database "Database" as RDB
+database "Firebase" as FDB
+
+activate Student
+Student -> FE : Selects study group from dashboard
+activate FE
+
+FE -> C : GET /groups/{groupId}/progress
+deactivate FE
+activate C
+
+C -> S : getGroupProgress(groupId)
+activate S
+
+S -> GMD : findAllMembersByGroupId(groupId)
+activate GMD
+GMD -> RDB : SELECT * FROM group_members WHERE group_id=?
+activate RDB
+RDB --> GMD : list of members
+deactivate RDB
+GMD --> S : members list
+deactivate GMD
+
+alt Group has no members
+    S --> C : 200 OK ("No data available yet.")
+    C --> FE : Show "No data available yet."
+    activate FE
+    FE -> Student : Display message
+    deactivate FE
+else Group has members
+    loop for each member
+        S -> FS : fetchProgress(userId)
+        activate FS
+        FS -> FDB : GET progress/focus data
+        activate FDB
+        FDB --> FS : progress %, hours
+        deactivate FDB
+        FS --> S : progress %, hours
+        deactivate FS
+    end
+
+    S -> S : Calculate rankings
+    S --> C : 200 OK (progress list + rankings)
+
+    C --> FE : Show progress + rankings
+    activate FE
+    FE -> Student : Display dashboard
+    deactivate FE
+end
+
+group [E1: Data fetch error]
+    FS -> FDB : GET ...
+    activate FDB
+    FDB --> FS : throws error
+    deactivate FDB
+    FS --> S : Exception
+    deactivate FS
+    S --> C : 500 Internal Server Error
+    deactivate S
+    C --> FE : Show "Unable to load progress data"
+    activate FE
+    FE -> Student : Display error
+    deactivate FE
+end
+
+@enduml

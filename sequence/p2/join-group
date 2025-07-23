@@ -1,0 +1,88 @@
+@startuml
+actor Student
+participant "Vue Frontend" as FE
+participant "StudyGroupController" as C
+participant "StudyGroupService" as S
+participant "StudyGroupDao" as SGD
+participant "UserDao" as UD
+participant "GroupMemberDao" as GMD
+participant "SecurityUtil" as SU
+database "Database" as DB
+
+activate Student
+Student -> FE : Clicks "Join Group"
+activate FE
+
+FE -> C : POST /groups/join { joinCode }
+deactivate FE
+activate C
+
+C -> S : joinGroup(dto)
+activate S
+
+S -> SGD : findByJoinCode(joinCode)
+activate SGD
+
+SGD -> DB : SELECT * FROM study_groups WHERE join_code=?
+activate DB
+DB --> SGD : StudyGroup or empty
+deactivate DB
+SGD --> S : Optional<StudyGroup>
+deactivate SGD
+
+alt Join code not found
+    S --> C : 400 Bad Request ("Invalid join code")
+    C --> FE : Show "Invalid join code"
+    activate FE
+    FE -> Student : Display error
+    deactivate FE
+else Join code found
+    S -> SU : getAuthenticatedUid()
+    activate SU
+    SU --> S : userUid
+    deactivate SU
+
+    S -> UD : findByUid(userUid)
+    activate UD
+    UD -> DB : SELECT * FROM users WHERE uid=?
+    activate DB
+    DB --> UD : User
+    deactivate DB
+    UD --> S : User
+    deactivate UD
+
+    S -> GMD : existsByUserAndGroup(user, group)
+    activate GMD
+    GMD -> DB : SELECT * FROM group_members WHERE user_id=? AND group_id=?
+    activate DB
+    DB --> GMD : true/false
+    deactivate DB
+    GMD --> S : result
+    deactivate GMD
+
+    alt Already a member
+        S --> C : 400 Bad Request ("Already a member")
+        C --> FE : Show already a member message
+        activate FE
+        FE -> Student : Display message
+        deactivate FE
+    else Not a member
+        S -> GMD : save(groupMember)
+        activate GMD
+        GMD -> DB : INSERT INTO group_members
+        activate DB
+        DB --> GMD : success
+        deactivate DB
+        GMD --> S : OK
+        deactivate GMD
+
+        S --> C : 200 OK ("Joined group: {group.name}")
+        deactivate S
+        C --> FE : Show success message
+        activate FE
+        FE -> Student : Display group info
+        deactivate FE
+    end
+end
+
+@enduml

@@ -1,0 +1,82 @@
+@startuml
+actor Student
+participant "Frontend" as FE
+participant "StudyGroupController (Spring Boot)" as C
+participant "StudyGroupService" as S
+participant "StudyGroupDao" as D
+participant "StudyGroupRepository" as R
+database "Database" as DB
+
+activate Student
+Student -> FE : Clicks "Create Group"
+activate FE
+
+FE -> C : POST /groups { groupRequestDTO }
+deactivate FE
+activate C
+
+C -> S : createGroup(groupRequestDTO)
+activate S
+
+S -> S : Validate group name
+alt Valid name
+    S -> S : Generate unique join code
+
+    S -> D : save(studyGroup)
+    activate D
+
+    D -> R : save(studyGroup)
+    activate R
+
+    R -> DB : INSERT INTO groups
+    activate DB
+    DB --> R : success
+    deactivate DB
+
+    R --> D : OK
+    deactivate R
+
+    D --> S : OK
+    deactivate D
+
+    S --> C : joinCode
+
+    C --> FE : 200 OK with joinCode
+    activate FE
+    FE -> Student : Show join code
+    deactivate FE
+else Invalid name
+    S --> C : 400 Bad Request
+    C --> FE : Error: "Group name required and < 50 chars"
+    activate FE
+    FE -> Student : Show validation error
+    deactivate FE
+else DB error
+    S -> D : save(studyGroup)
+    activate D
+
+    D -> R : save(studyGroup)
+    activate R
+
+    R -> DB : INSERT INTO groups
+    activate DB
+    DB --> R : SQL Error
+    deactivate DB
+
+    R --> D : Exception
+    deactivate R
+
+    D --> S : Exception
+    deactivate D
+
+    S --> C : 500 Internal Server Error
+    deactivate S
+
+    C --> FE : Error: "Group creation failed. Try again later."
+    deactivate C
+    activate FE
+    FE -> Student : Show DB error message
+    deactivate FE
+end
+
+@enduml

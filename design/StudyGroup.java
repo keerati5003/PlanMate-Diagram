@@ -7,6 +7,7 @@ public class StudyGroup {
     private Long id;
 
     private String name;
+    private String imageUrl;
 
     @Column(unique = true)
     private String joinCode;

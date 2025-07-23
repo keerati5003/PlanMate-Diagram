@@ -1,0 +1,15 @@
+@startuml
+
+class StudyGroupController {
+    - studyGroupService: StudyGroupService
+    + createGroup(dto: GroupRequestDTO) : ResponseEntity<?>
+    + joinGroup(dto: JoinGroupRequestDTO) : ResponseEntity<?>
+}
+
+class SessionController {
+    - sessionService: SessionService
+    + getToDoList() : ResponseEntity<?>
+    + startFocusSession(request: FocusSessionRequestDTO) : ResponseEntity<?>
+}
+
+@enduml
