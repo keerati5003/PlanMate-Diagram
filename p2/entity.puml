@@ -1,35 +1,34 @@
 @startuml
+
 class User {
-    - Long id
-    - String uid
-    - String email
-    ...
-}
-
-class FocusSession {
-    - Long id
-    - LocalDateTime startedAt
-    - LocalDateTime endedAt
-    - Boolean isShared
-}
-
-class StudySession {
-    - Long id
-    - String title
-    - LocalDateTime scheduledAt
-    - Boolean completed
-    - String subject
-    - Integer actualDurationInMinutes
-}
-
-class StudyGroup {
-    - Long id
-    - String name
-    - String imageUrl
-    - String joinCode
+    +uid: String
+    +email: String
 }
 
 class GroupMember {
-    - Long id
+    +id: Long
+    +user: User
+    +group: StudyGroup
 }
+
+class StudyGroup {
+    +id: Long
+    +name: String
+    +imageUrl: String
+    +joinCode: String
+    +members: List<GroupMember>
+}
+
+class FocusSession {
+    +id: String
+    +user: User
+    +session: Session
+    +course: Course
+    +topic: Topic
+    +focusStart: LocalDateTime
+    +focusEnd: LocalDateTime
+    +elapsedSeconds: Long
+    +status: FocusStatus
+}
+
 @enduml

@@ -1,0 +1,59 @@
+@startuml
+
+interface StudyGroupService {
+    + getGroups() : List<StudyGroupResponseDTO>
+    + createGroup(groupInfo: GroupRequestDTO) : ResponseEntity<?>
+    + joinGroup(dto: JoinGroupRequestDTO) : ResponseEntity<?>
+    + getGroupProgress(groupId: Long) : List<GroupMemberProgressDTO>
+}
+
+interface SessionService {
+    + getToDoListSessions() : Map<String, List<SessionDTO>>
+    + startFocusSession(sessionId: String) : Map<String, Object>
+    + endFocusSession(focusSessionId: String) : FocusSession
+}
+
+interface StudyAnalyticsService {
+    + getAnalytics(range: String) : StudyAnalyticsDTO
+}
+
+class StudyGroupServiceImpl {
+    - studyGroupDao
+    - groupMemberDao
+    - sessionDao
+    - focusSessionDao
+    - userDao
+    - random : SecureRandom
+
+    + getGroups() : List<StudyGroupResponseDTO>
+    + createGroup(groupInfo: GroupRequestDTO) : ResponseEntity<?>
+    + joinGroup(dto: JoinGroupRequestDTO) : ResponseEntity<?>
+    + getGroupProgress(groupId: Long) : List<GroupMemberProgressDTO>
+    - generateJoinCode() : String
+    - generateUniqueJoinCode() : String
+}
+
+class SessionServiceImpl {
+    - sessionDao
+    - focusSessionDao
+    - groupMemberDao
+    - firebaseFocusService
+    - userDao
+    - dtoMapper
+
+    + getToDoListSessions() : Map<String, List<SessionDTO>>
+    + startFocusSession(sessionId: String) : Map<String, Object>
+    + endFocusSession(focusSessionId: String) : FocusSession
+}
+
+class StudyAnalyticsServiceImpl {
+    - studyAnalyticsDao
+
+    + getAnalytics(range: String) : StudyAnalyticsDTO
+}
+
+StudyGroupServiceImpl ..|> StudyGroupService
+SessionServiceImpl ..|> SessionService
+StudyAnalyticsServiceImpl ..|> StudyAnalyticsService
+
+@enduml

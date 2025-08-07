@@ -1,0 +1,22 @@
+@startuml
+
+interface GroupMemberRepository {
+    +existsByUserAndGroup(user: User, group: StudyGroup): Boolean
+    +findByUser(user: User): List<GroupMember>
+    +findByGroupId(groupId: Long): List<GroupMember>
+}
+
+interface StudyGroupRepository {
+    +existsByJoinCode(code: String): boolean
+    +findByJoinCode(joinCode: String): Optional<StudyGroup>
+}
+
+interface FocusSessionRepository {
+    +countByUserUidAndStatusAndFocusStartBetween(uid: String, status: FocusStatus, start: LocalDateTime, end: LocalDateTime): int
+    +sumElapsedSeconds(uid: String, status: FocusStatus, start: LocalDateTime, end: LocalDateTime): long
+    +groupDailyFocusDurations(uid: String, status: FocusStatus, start: LocalDateTime, end: LocalDateTime): Map<LocalDate, Long>
+    +groupByCourseName(uid: String, status: FocusStatus, start: LocalDateTime, end: LocalDateTime): Map<String, Long>
+    +sumElapsedSecondsByUserUid(uid: String): long
+}
+
+@enduml

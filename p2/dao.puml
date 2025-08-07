@@ -1,0 +1,92 @@
+@startuml
+
+interface StudyGroupDao {
+    + save(studyGroup: StudyGroup) : StudyGroup
+    + existsByJoinCode(code: String) : boolean
+    + findByJoinCode(joinCode: String) : Optional<StudyGroup>
+}
+
+interface GroupMemberDao {
+    + save(groupMember: GroupMember) : GroupMember
+    + existsByUserAndGroup(user: User, group: StudyGroup) : Boolean
+    + findByUser(user: User) : List<GroupMember>
+    + findByGroupId(groupId: Long) : List<GroupMember>
+}
+
+interface FocusSessionDao {
+    + save(focusSession: FocusSession) : FocusSession
+    + findById(id: String) : FocusSession
+    + sumFocusSecondsByUser(uid: String) : long
+}
+
+interface SessionDao {
+    + getTodaySessions(user: User) : List<Session>
+    + getTomorrowSessions(user: User) : List<Session>
+    + getFutureSessions(user: User) : List<Session>
+    + save(session: Session) : Session
+    + findById(id: String) : Session
+    + countTotalPlannedSessionsForUser(uid: String) : int
+    + countCompletedSessionsForUser(uid: String) : int
+}
+
+interface StudyAnalyticsDao {
+    + countCompletedSessions(userId: String, range: String) : int
+    + sumFocusDuration(userId: String, range: String) : long
+    + getDailyFocusDurations(userId: String, range: String) : Map<LocalDate, Long>
+    + getSubjectBreakdown(userId: String, range: String) : Map<String, Long>
+}
+
+class StudyGroupDaoImpl {
+    - studyGroupRepository : StudyGroupRepository
+
+    + save(studyGroup: StudyGroup) : StudyGroup
+    + existsByJoinCode(code: String) : boolean
+    + findByJoinCode(joinCode: String) : Optional<StudyGroup>
+}
+
+class GroupMemberDaoImpl {
+    - groupMemberRepository : GroupMemberRepository
+
+    + save(groupMember: GroupMember) : GroupMember
+    + existsByUserAndGroup(user: User, group: StudyGroup) : Boolean
+    + findByUser(user: User) : List<GroupMember>
+    + findByGroupId(groupId: Long) : List<GroupMember>
+}
+
+class FocusSessionDaoImpl {
+    - focusSessionRepository : FocusSessionRepository
+
+    + save(focusSession: FocusSession) : FocusSession
+    + findById(id: String) : FocusSession
+    + sumFocusSecondsByUser(uid: String) : long
+}
+
+class SessionDaoImpl {
+    - sessionRepository : SessionRepository
+
+    + getTodaySessions(user: User) : List<Session>
+    + getTomorrowSessions(user: User) : List<Session>
+    + getFutureSessions(user: User) : List<Session>
+    + save(session: Session) : Session
+    + findById(id: String) : Session
+    + countTotalPlannedSessionsForUser(uid: String) : int
+    + countCompletedSessionsForUser(uid: String) : int
+}
+
+class StudyAnalyticsDaoImpl {
+    - focusSessionRepository : FocusSessionRepository
+
+    + countCompletedSessions(userId: String, range: String) : int
+    + sumFocusDuration(userId: String, range: String) : long
+    + getDailyFocusDurations(userId: String, range: String) : Map<LocalDate, Long>
+    + getSubjectBreakdown(userId: String, range: String) : Map<String, Long>
+    - getStartDate(range: String) : LocalDateTime
+}
+
+StudyGroupDaoImpl ..|> StudyGroupDao
+GroupMemberDaoImpl ..|> GroupMemberDao
+FocusSessionDaoImpl ..|> FocusSessionDao
+SessionDaoImpl ..|> SessionDao
+StudyAnalyticsDaoImpl ..|> StudyAnalyticsDao
+
+@enduml
