@@ -114,7 +114,6 @@ class ExamServiceImpl {
   - examDao: ExamDao
 }
 
-
 UserServiceImpl ..|> UserService
 TopicServiceImpl ..|> TopicService
 TermServiceImpl ..|> TermService

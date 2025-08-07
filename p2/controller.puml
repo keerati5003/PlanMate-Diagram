@@ -1,19 +1,21 @@
 @startuml
+title UML Class Diagram - Controller Layer
 
 class StudyGroupController {
-    + getGroups() : ResponseEntity<List<StudyGroupResponseDTO>>
+    - studyGroupService : StudyGroupService
     + createGroup(dto: GroupRequestDTO) : ResponseEntity<?>
     + joinGroup(dto: JoinGroupRequestDTO) : ResponseEntity<?>
-    + getGroupProgress(groupId: Long) : ResponseEntity<?>
 }
 
 class SessionController {
-    + getToDoList() : ResponseEntity<ToDoListResponseDTO>
-    + startFocusSession(request: StartFocusSessionDTO) : ResponseEntity<?>
-    + endFocusSession(request: EndFocusSessionDTO) : ResponseEntity<?>
+    - sessionService : SessionService
+    + getToDoList() : ResponseEntity<?>
+    + startFocusSession(request: StartFocusSessionDTO): ResponseEntity<?>
 }
 
+
 class StudyAnalyticsController {
+    - studyAnalyticsService : StudyAnalyticsService
     + getAnalytics(range: Range) : ResponseEntity<StudyAnalyticsDTO>
 }
 
