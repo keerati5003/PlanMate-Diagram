@@ -19,7 +19,19 @@ C -> S : createGroup(groupRequestDTO)
 activate S
 
 S -> S : Validate group name
-alt Valid name
+alt Null name
+    S --> C : 400 Bad Request
+    C --> FE : Error: "Group name is required."
+    activate FE
+    FE -> Student : Show 'name required' message
+    deactivate FE
+else Invalid name (length > 50)
+    S --> C : 400 Bad Request
+    C --> FE : Error: "Group name must be less than 50 characters."
+    activate FE
+    FE -> Student : Show validation error
+    deactivate FE
+else Valid name
     S -> S : Generate unique join code
 
     S -> D : save(studyGroup)
@@ -44,12 +56,6 @@ alt Valid name
     C --> FE : 200 OK with joinCode
     activate FE
     FE -> Student : Show join code
-    deactivate FE
-else Invalid name
-    S --> C : 400 Bad Request
-    C --> FE : Error: "Group name required and < 50 chars"
-    activate FE
-    FE -> Student : Show validation error
     deactivate FE
 else DB error
     S -> D : save(studyGroup)
