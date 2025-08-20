@@ -1,0 +1,33 @@
+@startuml
+actor Student
+participant "UI (Focus Page)" as FE
+database "Firebase Realtime DB" as FB
+
+Student -> FE : Click "Friends" icon
+activate Student
+activate FE
+FE -> FB : Subscribe activeGroups/{groupId}
+activate FB
+FB --> FE : Member UIDs (except current user)
+deactivate FB
+
+loop For each member UID
+  FE -> FB : Subscribe activeUsers/{uid}
+  activate FB
+  FB --> FE : User data (name, image, focusSessionId)
+  deactivate FB
+
+  alt User has active focus session
+    FE -> FB : Subscribe focusSessions/{focusSessionId}
+    activate FB
+    FB --> FE : Session data (status, duration, elapsed)
+    deactivate FB
+  else No active session
+    FE <- FB : Status=ONLINE
+  end
+end
+
+FE -> Student : Display Online Friends List
+deactivate FE
+deactivate Student
+@enduml

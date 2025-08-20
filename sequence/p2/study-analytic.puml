@@ -1,0 +1,51 @@
+
+@startuml
+actor Student
+participant "UI" as UI
+participant "API" as API
+participant "Service" as Service
+database "Database" as DB
+
+Student -> UI : Open Profile Page
+activate Student
+activate UI
+
+UI -> API : GET /analytics?range={range}&date={date}
+activate API
+
+API -> Service : getAnalytics(range, date)
+activate Service
+
+Service -> Service : Get authenticated userUid
+
+Service -> DB : Count completed sessions
+activate DB
+DB --> Service : totalSessions
+deactivate DB
+
+Service -> DB : Sum focus durations
+activate DB
+DB --> Service : totalDuration
+deactivate DB
+
+Service -> DB : Get subject breakdown
+activate DB
+DB --> Service : subjectBreakdown
+deactivate DB
+
+Service -> DB : Get completed sessions with times
+activate DB
+DB --> Service : session details
+deactivate DB
+
+Service -> Service : Build StudyAnalyticsDTO
+Service --> API : StudyAnalyticsDTO
+deactivate Service
+
+API --> UI : ResponseEntity<StudyAnalyticsDTO>
+deactivate API
+
+UI -> Student : Display Analytics (sessions, duration, breakdown)
+deactivate UI
+deactivate Student
+@enduml

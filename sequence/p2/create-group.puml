@@ -1,10 +1,8 @@
 @startuml
 actor Student
-participant "Frontend" as FE
-participant "StudyGroupController (Spring Boot)" as C
-participant "StudyGroupService" as S
-participant "StudyGroupDao" as D
-participant "StudyGroupRepository" as R
+participant "UI" as FE
+participant "API" as C
+participant "Service" as S
 database "Database" as DB
 
 activate Student
@@ -19,70 +17,16 @@ C -> S : createGroup(groupRequestDTO)
 activate S
 
 S -> S : Validate group name
-alt Null name
-    S --> C : 400 Bad Request
-    C --> FE : Error: "Group name is required."
-    activate FE
-    FE -> Student : Show 'name required' message
-    deactivate FE
-else Invalid name (length > 50)
-    S --> C : 400 Bad Request
-    C --> FE : Error: "Group name must be less than 50 characters."
-    activate FE
-    FE -> Student : Show validation error
-    deactivate FE
-else Valid name
-    S -> S : Generate unique join code
+S -> S : Generate unique join code
 
-    S -> D : save(studyGroup)
-    activate D
+S -> DB : INSERT new group
+activate DB
+DB --> S : success
+deactivate DB
 
-    D -> R : save(studyGroup)
-    activate R
-
-    R -> DB : INSERT INTO groups
-    activate DB
-    DB --> R : success
-    deactivate DB
-
-    R --> D : OK
-    deactivate R
-
-    D --> S : OK
-    deactivate D
-
-    S --> C : joinCode
-
-    C --> FE : 200 OK with joinCode
-    activate FE
-    FE -> Student : Show join code
-    deactivate FE
-else DB error
-    S -> D : save(studyGroup)
-    activate D
-
-    D -> R : save(studyGroup)
-    activate R
-
-    R -> DB : INSERT INTO groups
-    activate DB
-    DB --> R : SQL Error
-    deactivate DB
-
-    R --> D : Exception
-    deactivate R
-
-    D --> S : Exception
-    deactivate D
-
-    S --> C : 500 Internal Server Error
-    deactivate S
-
-    C --> FE : Error: "Group creation failed. Try again later."
-    deactivate C
-    activate FE
-    FE -> Student : Show DB error message
-    deactivate FE
-end
-
+S --> C : joinCode
+C --> FE : 200 OK with joinCode
+activate FE
+FE -> Student : Show join code
+deactivate FE
 @enduml

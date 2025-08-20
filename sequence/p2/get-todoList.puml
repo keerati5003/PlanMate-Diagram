@@ -1,16 +1,12 @@
 @startuml
 actor Student
-participant "Frontend" as FE
-participant "ToDoListController" as C
-participant "SessionService" as S
-participant "SecurityUtil" as SU
-participant "UserDao" as UD
-participant "SessionDao" as SD
-participant "SessionRepository" as SR
+participant "UI" as FE
+participant "API" as C
+participant "Service" as S
 database "Database" as DB
 
 activate Student
-Student -> FE : Go to To-Do List page
+Student -> FE : Open To-Do List page
 activate FE
 
 FE -> C : GET /todo
@@ -18,114 +14,25 @@ deactivate FE
 activate C
 
 C -> S : getToDoListSessions()
+deactivate C
 activate S
 
-S -> SU : getAuthenticatedUid()
-SU --> S : userUid
+S -> DB : Query sessions for\n• today\n• tomorrow\n• upcoming(> tomorrow)
+activate DB
+DB --> S : Raw session rows
+deactivate DB
 
-S -> UD : findByUid(userUid)
-UD --> S : user
+S -> S : Map & categorize to DTOs\n(today, tomorrow, upcoming)
 
-alt No sessions found
-    S -> SD : getTodaySessions(user)
-    activate SD
-    SD -> SR : findBySchedule_UserAndDate(user, today)
-    activate SR
-    SR -> DB : SELECT sessions WHERE user AND date = TODAY
-    activate DB
-    DB --> SR : []
-    deactivate DB
-    SR --> SD : []
-    deactivate SR
-    SD --> S : []
-    deactivate SD
+S --> C : 200 OK + { today[], tomorrow[], upcoming[] }
+deactivate S
+activate C
 
-    S -> SD : getTomorrowSessions(user)
-    activate SD
-    SD -> SR : findBySchedule_UserAndDate(user, tomorrow)
-    activate SR
-    SR -> DB : SELECT sessions WHERE user AND date = TOMORROW
-    activate DB
-    DB --> SR : []
-    deactivate DB
-    SR --> SD : []
-    deactivate SR
-    SD --> S : []
-    deactivate SD
+C --> FE : Render categorized list\n(today/tomorrow/upcoming)
+deactivate C
+activate FE
 
-    S -> SD : getFutureSessions(user)
-    activate SD
-    SD -> SR : findBySchedule_UserAndDateAfter(user, tomorrow)
-    activate SR
-    SR -> DB : SELECT sessions WHERE user AND date > TOMORROW
-    activate DB
-    DB --> SR : []
-    deactivate DB
-    SR --> SD : []
-    deactivate SR
-    SD --> S : []
-    deactivate SD
-
-    S --> C : 200 OK ("You have no upcoming sessions.")
-    deactivate S
-
-    C --> FE : Show message
-    activate FE
-    FE -> Student : Display "You have no upcoming sessions."
-    deactivate FE
-
-else Sessions found
-    S -> SD : getTodaySessions(user)
-    activate SD
-    SD -> SR : findBySchedule_UserAndDate(user, today)
-    activate SR
-    SR -> DB : SELECT sessions WHERE user AND date = TODAY
-    activate DB
-    DB --> SR : todaySessions
-    deactivate DB
-    SR --> SD : todaySessions
-    deactivate SR
-    SD --> S : todaySessions
-    deactivate SD
-
-    S -> SD : getTomorrowSessions(user)
-    activate SD
-    SD -> SR : findBySchedule_UserAndDate(user, tomorrow)
-    activate SR
-    SR -> DB : SELECT sessions WHERE user AND date = TOMORROW
-    activate DB
-    DB --> SR : tomorrowSessions
-    deactivate DB
-    SR --> SD : tomorrowSessions
-    deactivate SR
-    SD --> S : tomorrowSessions
-    deactivate SD
-
-    S -> SD : getFutureSessions(user)
-    activate SD
-    SD -> SR : findBySchedule_UserAndDateAfter(user, tomorrow)
-    activate SR
-    SR -> DB : SELECT sessions WHERE user AND date > TOMORROW
-    activate DB
-    DB --> SR : upcomingSessions
-    deactivate DB
-    SR --> SD : upcomingSessions
-    deactivate SR
-    SD --> S : upcomingSessions
-    deactivate SD
-
-    S -> S : Map to DTOs (today, tomorrow, upcoming)
-    S --> C : 200 OK (categorized DTO lists)
-    deactivate S
-
-    C --> FE : Render categorized to-do list
-    activate FE
-    FE -> Student : Display categorized lists
-    deactivate FE
-end
-
-group [List rendering fails]
-    FE -> FE : Rendering error
-    FE -> Student : "Unable to display session to-do list."
-end
+FE -> Student : Display To-Do List
+deactivate FE
+deactivate Student
 @enduml

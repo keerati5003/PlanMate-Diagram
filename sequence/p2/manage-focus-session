@@ -1,0 +1,125 @@
+@startuml
+actor Student
+participant "UI" as FE
+participant "API" as C
+participant "Service" as S
+database "Database" as DB
+database "Firebase Realtime DB" as FB
+
+' --- Start ---
+
+Student -> FE : Select session → Start Focus
+activate Student
+activate FE
+FE -> C : POST /focus/{sessionId}/start
+deactivate FE
+activate C
+C -> S : startFocusSession(sessionId)
+activate S
+S -> DB : Save FocusSession (status=FOCUSING)
+activate DB
+DB --> S : OK
+deactivate DB
+S -> FB : Publish FocusSession (status=FOCUSING)
+activate FB
+FB --> S : ACK
+deactivate FB
+S --> C : FocusSessionDTO
+deactivate S
+C --> FE : 200 OK + focusSessionId
+deactivate C
+activate FE
+FE -> Student : Navigate to Focus Mode
+deactivate FE
+
+' --- Load Active ---
+FE -> C : GET /focus/active
+activate C
+C -> S : getActiveFocusSession(userUid)
+activate S
+S -> DB : Query active/paused session
+activate DB
+DB --> S : FocusSessionDTO
+deactivate DB
+S --> C : FocusSessionDTO
+deactivate S
+C --> FE : Active session info
+deactivate C
+activate FE
+FE -> Student : Show timer (FOCUSING / controls)
+deactivate FE
+
+' --- Pause ---
+Student -> FE : Click "Pause"
+activate FE
+FE -> C : POST /focus/{id}/pause
+deactivate FE
+activate C
+C -> S : pauseFocusSession(id)
+activate S
+S -> DB : Update status=PAUSED, elapsed
+activate DB
+DB --> S : OK
+deactivate DB
+S -> FB : Update session (status=PAUSED)
+activate FB
+FB --> S : ACK
+deactivate FB
+S --> C : FocusSessionDTO
+deactivate S
+C --> FE : 200 OK
+deactivate C
+activate FE
+FE -> Student : Show Paused
+deactivate FE
+
+' --- Resume ---
+Student -> FE : Click "Resume"
+activate FE
+FE -> C : POST /focus/{id}/resume
+deactivate FE
+activate C
+C -> S : resumeFocusSession(id)
+activate S
+S -> DB : Update status=FOCUSING
+activate DB
+DB --> S : OK
+deactivate DB
+S -> FB : Update session (status=FOCUSING)
+activate FB
+FB --> S : ACK
+deactivate FB
+S --> C : FocusSessionDTO
+deactivate S
+C --> FE : 200 OK
+deactivate C
+activate FE
+FE -> Student : Timer resumes
+deactivate FE
+
+' --- End ---
+Student -> FE : Click "End Session"
+activate FE
+FE -> C : POST /focus/{id}/end
+deactivate FE
+activate C
+C -> S : endFocusSession(id)
+activate S
+S -> DB : Finalize (elapsed, status=COMPLETED)
+activate DB
+DB --> S : OK
+deactivate DB
+S -> FB : Clear focus session
+activate FB
+FB --> S : ACK
+deactivate FB
+S --> C : FocusSessionDTO (COMPLETED)
+deactivate S
+C --> FE : 200 OK + summary
+deactivate C
+activate FE
+FE -> Student : Show summary & stats
+deactivate FE
+deactivate Student
+
+@enduml
