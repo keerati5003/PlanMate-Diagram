@@ -25,10 +25,13 @@ class FocusSession {
     +session: Session
     +course: Course
     +topic: Topic
+    +assignment: Assignment
     +focusStart: LocalDateTime
     +focusEnd: LocalDateTime
     +elapsedSeconds: Long
+    +plannedDuration: Long
     +status: FocusStatus
+    +sessionType: SessionType
 }
 
 @enduml
