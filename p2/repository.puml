@@ -14,18 +14,9 @@ interface StudyGroupRepository {
 interface FocusSessionRepository {
     +countByUserUidAndStatusAndFocusStartBetween(uid: String, status: FocusStatus, start: LocalDateTime, end: LocalDateTime): int
     +sumElapsedSeconds(uid: String, status: FocusStatus, start: LocalDateTime, end: LocalDateTime): long
-    +groupByCourseName(uid: String, status: FocusStatus, start: LocalDateTime, end: LocalDateTime): List<Object[]>
+    +groupDailyFocusDurations(uid: String, status: FocusStatus, start: LocalDateTime, end: LocalDateTime): Map<LocalDate, Long>
+    +groupByCourseName(uid: String, status: FocusStatus, start: LocalDateTime, end: LocalDateTime): Map<String, Long>
     +sumElapsedSecondsByUserUid(uid: String): long
-    +findByUserUidAndStatus(userUid: String, focusStatus: FocusStatus): Optional<FocusSession>
-    +findCompletedSessionsWithTimes(userUid: String, status: FocusStatus, start: LocalDateTime, end: LocalDateTime): List<Object[]>
-}
-
-interface SessionRepository {
-    +findBySchedule_UserAndDate(user: User, date: LocalDate): List<Session>
-    +findBySchedule_UserAndDateAfter(user: User, date: LocalDate): List<Session>
-    +countBySchedule_User_Uid(uid: String): int
-    +countBySchedule_User_UidAndFocusSessions_Status(uid: String, status: FocusStatus): int
-    +getCompletedSessions(user: User): List<Session>
 }
 
 @enduml

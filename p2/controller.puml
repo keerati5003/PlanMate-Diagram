@@ -3,34 +3,20 @@ title UML Class Diagram - Controller Layer
 
 class StudyGroupController {
     - studyGroupService : StudyGroupService
-    + getGroups() : ResponseEntity<List<StudyGroupResponseDTO>>
     + createGroup(dto: GroupRequestDTO) : ResponseEntity<?>
-    + joinGroup(joinCode: String) : ResponseEntity<?>
-    + getGroupProgress(groupId: Long) : ResponseEntity<?>
+    + joinGroup(dto: JoinGroupRequestDTO) : ResponseEntity<?>
 }
 
 class SessionController {
     - sessionService : SessionService
-    + getToDoList() : ResponseEntity<ToDoListResponseDTO>
-    + getCompletedSessions() : ResponseEntity<List<SessionDTO>>
+    + getToDoList() : ResponseEntity<?>
+    + startFocusSession(request: StartFocusSessionDTO): ResponseEntity<?>
 }
+
 
 class StudyAnalyticsController {
     - studyAnalyticsService : StudyAnalyticsService
-    + getAnalytics(range: Range, date: LocalDate) : ResponseEntity<StudyAnalyticsDTO>
-}
-
-class FocusSessionController {
-    - focusSessionService : FocusSessionService
-    + getFocusSession(id: String) : ResponseEntity<FocusSessionDTO>
-    + getActiveFocusSession() : ResponseEntity<FocusSessionDTO>
-    + startFocusSession(sessionId: String) : ResponseEntity<?>
-    + pauseFocusSession(focusId: String) : ResponseEntity<?>
-    + resumeFocusSession(focusId: String) : ResponseEntity<?>
-    + endFocusSession(focusId: String) : ResponseEntity<?>
-    + inviteToSharedRoom(targetUserId: String) : ResponseEntity<?>
-    + joinSharedRoom(roomId: String) : ResponseEntity<?>
-    + declineInvitation(invitationId: String) : ResponseEntity<?>
+    + getAnalytics(range: Range) : ResponseEntity<StudyAnalyticsDTO>
 }
 
 @enduml

@@ -5,23 +5,21 @@ class GroupRequestDTO {
     - imageUrl: String
 }
 
+class JoinGroupRequestDTO {
+    - joinCode: String
+}
+
+class StartFocusSessionDTO {
+    - sessionId: String
+}
+
+class EndFocusSessionDTO {
+    - focusSessionId: String
+}
+
 class GroupMemberDTO {
     - id: long
     - user: User
-}
-
-class MemberProfileDTO {
-    - memberId: String
-    - displayName: String
-    - photoUrl: String
-}
-
-class GroupMemberProgressDTO {
-    - member: MemberProfileDTO
-    - completedSessions: int
-    - totalFocusSeconds: long
-    - percentageCompleted: double
-    - points: long
 }
 
 class StudyGroupResponseDTO {
@@ -32,49 +30,24 @@ class StudyGroupResponseDTO {
     - members: List<GroupMemberDTO>
 }
 
-class FocusSessionDTO {
-    - id: String
-    - session: SessionDTO
-    - courseId: Long
-    - topicId: String
-    - assignmentId: String
-    - courseName: String
-    - displayName: String
-    - focusStart: LocalDateTime
-    - focusEnd: LocalDateTime
-    - elapsedSeconds: Long
-    - plannedDuration: Long
-    - status: FocusStatus
-    - sessionType: SessionType
-    - topicName: String <<JsonIgnore>>
-    - assignmentName: String <<JsonIgnore>>
+class GroupMemberProgressDTO {
+    - userUid: String
+    - completedSessions: int
+    - totalFocusSeconds: long
+    - totalScore: double
 }
 
 class StudyAnalyticsDTO {
     - totalCompletedFocusSessions: int
     - totalFocusDuration: long
+    - dailyFocusDurations: Map<LocalDate, Long>
     - subjectBreakdown: Map<String, Long>
-    - focusSessions: List<FocusSessionDetailDTO>
-}
-
-class StudyAnalyticsDTO.FocusSessionDetailDTO {
-    - id: String
-    - courseName: String
-    - focusStart: LocalDateTime
-    - focusEnd: LocalDateTime
-    - elapsed: long
 }
 
 class ToDoListResponseDTO {
     - today: List<SessionDTO>
     - tomorrow: List<SessionDTO>
     - upcoming: List<SessionDTO>
-}
-
-class AvailabilityRequestDTO {
-    - date: LocalDate
-    - startTime: LocalTime
-    - endTime: LocalTime
 }
 
 @enduml

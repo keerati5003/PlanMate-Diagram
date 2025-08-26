@@ -4,29 +4,18 @@ title Service Layer Overview
 interface StudyGroupService {
     + getGroups(): List<StudyGroupResponseDTO>
     + createGroup(groupInfo: GroupRequestDTO): ResponseEntity<?>
-    + joinGroup(joinCode: String): ResponseEntity<?>
+    + joinGroup(dto: JoinGroupRequestDTO): ResponseEntity<?>
     + getGroupProgress(groupId: Long): List<GroupMemberProgressDTO>
 }
 
 interface SessionService {
     + getToDoListSessions(): Map<String, List<SessionDTO>>
-    + getCompletedSessions(): List<SessionDTO>
+    + startFocusSession(sessionId: String): Map<String, Object>
+    + endFocusSession(focusSessionId: String): FocusSession
 }
 
 interface StudyAnalyticsService {
-    + getAnalytics(range: String, date: LocalDate): StudyAnalyticsDTO
-}
-
-interface FocusSessionService {
-    + getFocusSessionById(id: String): FocusSessionDTO
-    + getActiveFocusSessionForUser(userUid: String): FocusSessionDTO
-    + startFocusSession(sessionId: String): Map<String, Object>
-    + pauseFocusSession(focusSessionId: String): FocusSessionDTO
-    + resumeFocusSession(focusSessionId: String): FocusSessionDTO
-    + endFocusSession(focusSessionId: String): FocusSessionDTO
-    + joinSharedFocusRoom(roomId: String): Map<String, Object>
-    + inviteUserToSharedRoom(targetUserId: String): Map<String, Object>
-    + declineInvitation(invitationId: String): Map<String, Object>
+    + getAnalytics(range: String): StudyAnalyticsDTO
 }
 
 @enduml
