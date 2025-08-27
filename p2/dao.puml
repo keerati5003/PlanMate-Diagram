@@ -17,6 +17,7 @@ interface FocusSessionDao {
     + save(focusSession: FocusSession) : FocusSession
     + findById(id: String) : FocusSession
     + sumFocusSecondsByUser(uid: String) : long
+    + findByUserUidAndStatus(userUid: String, focusStatus: FocusStatus) : FocusSession
 }
 
 interface SessionDao {
@@ -27,13 +28,14 @@ interface SessionDao {
     + findById(id: String) : Session
     + countTotalPlannedSessionsForUser(uid: String) : int
     + countCompletedSessionsForUser(uid: String) : int
+    + getCompletedSessions(user: User) : List<Session>
 }
 
 interface StudyAnalyticsDao {
-    + countCompletedSessions(userId: String, range: String) : int
-    + sumFocusDuration(userId: String, range: String) : long
-    + getDailyFocusDurations(userId: String, range: String) : Map<LocalDate, Long>
-    + getSubjectBreakdown(userId: String, range: String) : Map<String, Long>
+    + countCompletedSessions(userUid: String, range: String, date: LocalDate) : int
+    + sumFocusDuration(userUid: String, range: String, date: LocalDate) : long
+    + getSubjectBreakdown(userUid: String, range: String, date: LocalDate) : Map<String, Long>
+    + getCompletedSessionsWithTimes(userUid: String, range: String, date: LocalDate) : List<Object[]>
 }
 
 class StudyGroupDaoImpl {
@@ -59,6 +61,7 @@ class FocusSessionDaoImpl {
     + save(focusSession: FocusSession) : FocusSession
     + findById(id: String) : FocusSession
     + sumFocusSecondsByUser(uid: String) : long
+    + findByUserUidAndStatus(userUid: String, focusStatus: FocusStatus) : FocusSession
 }
 
 class SessionDaoImpl {
@@ -71,16 +74,18 @@ class SessionDaoImpl {
     + findById(id: String) : Session
     + countTotalPlannedSessionsForUser(uid: String) : int
     + countCompletedSessionsForUser(uid: String) : int
+    + getCompletedSessions(user: User) : List<Session>
 }
 
 class StudyAnalyticsDaoImpl {
     - focusSessionRepository : FocusSessionRepository
 
-    + countCompletedSessions(userId: String, range: String) : int
-    + sumFocusDuration(userId: String, range: String) : long
-    + getDailyFocusDurations(userId: String, range: String) : Map<LocalDate, Long>
-    + getSubjectBreakdown(userId: String, range: String) : Map<String, Long>
-    - getStartDate(range: String) : LocalDateTime
+    + countCompletedSessions(userUid: String, range: String, date: LocalDate) : int
+    + sumFocusDuration(userUid: String, range: String, date: LocalDate) : long
+    + getSubjectBreakdown(userUid: String, range: String, date: LocalDate) : Map<String, Long>
+    + getCompletedSessionsWithTimes(userUid: String, range: String, date: LocalDate) : List<Object[]>
+    - getStartDate(range: String, date: LocalDate) : LocalDateTime
+    - getEndDate(range: String, date: LocalDate) : LocalDateTime
 }
 
 StudyGroupDaoImpl ..|> StudyGroupDao

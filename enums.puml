@@ -7,9 +7,24 @@ enum ExamType {
 }
 
 enum SessionType {
-    STUDY
-    REVIEW
-    ASSIGNMEN
+    OVERVIEW
+    CORE_STUDY
+    FINAL_REVIEW
+    ASSIGNMENT
+}
+
+enum FocusStatus {
+    INCOMPLETE   
+    FOCUSING
+    PAUSED
+    COMPLETED    
+}
+
+enum Range {
+    DAY
+    WEEK
+    MONTH
+    YEAR
 }
 
 @enduml
