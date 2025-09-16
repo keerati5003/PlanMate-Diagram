@@ -1,12 +1,12 @@
 @startuml
-actor Student
+actor User
 participant "UI" as FE
 participant "API" as C
 participant "Service" as S
 database "Database" as DB
 
-activate Student
-Student -> FE : Open To-Do List page
+activate User
+User -> FE : Open To-Do List page
 activate FE
 
 FE -> C : GET /todo
@@ -32,7 +32,7 @@ C --> FE : Render categorized list\n(today/tomorrow/upcoming)
 deactivate C
 activate FE
 
-FE -> Student : Display To-Do List
+FE -> User : Display To-Do List
 deactivate FE
-deactivate Student
+deactivate User
 @enduml

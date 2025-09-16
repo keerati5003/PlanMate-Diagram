@@ -1,13 +1,13 @@
 
 @startuml
-actor Student
+actor User
 participant "UI" as UI
 participant "API" as API
 participant "Service" as Service
 database "Database" as DB
 
-Student -> UI : Open Profile Page
-activate Student
+User -> UI : Open Profile Page
+activate User
 activate UI
 
 UI -> API : GET /analytics?range={range}&date={date}
@@ -45,7 +45,7 @@ deactivate Service
 API --> UI : ResponseEntity<StudyAnalyticsDTO>
 deactivate API
 
-UI -> Student : Display Analytics (sessions, duration, breakdown)
+UI -> User : Display Analytics (sessions, duration, breakdown)
 deactivate UI
-deactivate Student
+deactivate User
 @enduml

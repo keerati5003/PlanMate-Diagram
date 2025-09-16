@@ -1,5 +1,5 @@
 @startuml
-actor Student
+actor User
 participant "UI" as FE
 participant "API" as C
 participant "Service" as S
@@ -8,8 +8,8 @@ database "Firebase Realtime DB" as FB
 
 ' --- Start ---
 
-Student -> FE : Select session → Start Focus
-activate Student
+User -> FE : Select session → Start Focus
+activate User
 activate FE
 FE -> C : POST /focus/{sessionId}/start
 deactivate FE
@@ -29,11 +29,12 @@ deactivate S
 C --> FE : 200 OK + focusSessionId
 deactivate C
 activate FE
-FE -> Student : Navigate to Focus Mode
-deactivate FE
+FE -> User : Navigate to Focus Mode
+
 
 ' --- Load Active ---
 FE -> C : GET /focus/active
+deactivate FE
 activate C
 C -> S : getActiveFocusSession(userUid)
 activate S
@@ -46,11 +47,11 @@ deactivate S
 C --> FE : Active session info
 deactivate C
 activate FE
-FE -> Student : Show timer (FOCUSING / controls)
+FE -> User : Show timer (FOCUSING / controls)
 deactivate FE
 
 ' --- Pause ---
-Student -> FE : Click "Pause"
+User -> FE : Click "Pause"
 activate FE
 FE -> C : POST /focus/{id}/pause
 deactivate FE
@@ -70,11 +71,11 @@ deactivate S
 C --> FE : 200 OK
 deactivate C
 activate FE
-FE -> Student : Show Paused
+FE -> User : Show Paused
 deactivate FE
 
 ' --- Resume ---
-Student -> FE : Click "Resume"
+User -> FE : Click "Resume"
 activate FE
 FE -> C : POST /focus/{id}/resume
 deactivate FE
@@ -94,11 +95,11 @@ deactivate S
 C --> FE : 200 OK
 deactivate C
 activate FE
-FE -> Student : Timer resumes
+FE -> User : Timer resumes
 deactivate FE
 
 ' --- End ---
-Student -> FE : Click "End Session"
+User -> FE : Click "End Session"
 activate FE
 FE -> C : POST /focus/{id}/end
 deactivate FE
@@ -118,8 +119,8 @@ deactivate S
 C --> FE : 200 OK + summary
 deactivate C
 activate FE
-FE -> Student : Show summary & stats
+FE -> User : Show summary & stats
 deactivate FE
-deactivate Student
+deactivate User
 
 @enduml

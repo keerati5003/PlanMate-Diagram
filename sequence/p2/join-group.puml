@@ -1,12 +1,12 @@
 @startuml
-actor Student
+actor User
 participant "UI" as FE
 participant "API" as C
 participant "Service" as S
 database "Database" as DB
 
-activate Student
-Student -> FE : Clicks "Join Group"
+activate User
+User -> FE : Clicks "Join Group"
 activate FE
 
 FE -> C : POST /groups/join/{joinCode}
@@ -36,7 +36,7 @@ deactivate S
 
 C --> FE : Show success message
 activate FE
-FE -> Student : Display group info
+FE -> User : Display group info
 deactivate FE
-deactivate Student
+deactivate User
 @enduml

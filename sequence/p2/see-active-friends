@@ -1,33 +1,35 @@
 @startuml
-actor Student
-participant "UI (Focus Page)" as FE
+actor User
+participant "UI (Focus Mode Page)" as FE
 database "Firebase Realtime DB" as FB
 
-Student -> FE : Click "Friends" icon
-activate Student
+User -> FE : Call subscribeToFriends(rawGroupIds, currentUserId)
+activate User
 activate FE
-FE -> FB : Subscribe activeGroups/{groupId}
-activate FB
-FB --> FE : Member UIDs (except current user)
-deactivate FB
 
-loop For each member UID
-  FE -> FB : Subscribe activeUsers/{uid}
+FE -> FE : normalizeGroups(rawGroupIds) → groupIds
+
+loop For each groupId
+  FE -> FB : Subscribe activeGroups/{groupId}
   activate FB
-  FB --> FE : User data (name, image, focusSessionId)
+  FB --> FE : Members snapshot
   deactivate FB
 
-  alt User has active focus session
-    FE -> FB : Subscribe focusSessions/{focusSessionId}
+  FE -> FE : Filter out currentUserId\nUpdate groupMembers[groupId]
+
+  FE -> FE : Build union of all members across groups
+
+  FE -> FE : Sync onlineFriends list\n(create if missing)
+
+  loop For each member UID
+    FE -> FB : Subscribe activeUsers/{uid}
     activate FB
-    FB --> FE : Session data (status, duration, elapsed)
+    FB --> FE : User data (name, image, focusSessionId)
     deactivate FB
-  else No active session
-    FE <- FB : Status=ONLINE
   end
 end
 
-FE -> Student : Display Online Friends List
+FE -> User : Online Friends List updated reactively
 deactivate FE
-deactivate Student
+deactivate User
 @enduml

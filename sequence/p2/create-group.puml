@@ -1,12 +1,12 @@
 @startuml
-actor Student
+actor User
 participant "UI" as FE
 participant "API" as C
 participant "Service" as S
 database "Database" as DB
 
-activate Student
-Student -> FE : Clicks "Create Group"
+activate User
+User -> FE : Clicks "Create Group"
 activate FE
 
 FE -> C : POST /groups { groupRequestDTO }
@@ -27,6 +27,6 @@ deactivate DB
 S --> C : joinCode
 C --> FE : 200 OK with joinCode
 activate FE
-FE -> Student : Show join code
+FE -> User : Show join code
 deactivate FE
 @enduml

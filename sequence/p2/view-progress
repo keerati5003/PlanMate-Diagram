@@ -1,12 +1,12 @@
 @startuml
-actor Student
+actor User
 participant "UI" as UI
 participant "API" as API
 participant "Service" as Service
 database "Database" as DB
 
-activate Student
-Student -> UI : Selects study group from dashboard
+activate User
+User -> UI : Selects study group from dashboard
 activate UI
 
 UI -> API : GET /groups/{groupId}/progress
@@ -35,7 +35,7 @@ activate API
 API --> UI : Show progress + rankings
 deactivate API
 activate UI
-UI -> Student : Display dashboard
+UI -> User : Display dashboard
 deactivate UI
-deactivate Student
+deactivate User
 @enduml

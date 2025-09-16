@@ -1,0 +1,85 @@
+@startuml
+actor "Peer Member" as Peer
+actor "User" as U
+participant "UI" as FE
+participant "API" as C
+participant "Service" as S
+database "Database" as DB
+database "Firebase" as FB
+
+== Invitation Sent ==
+Peer -> S : inviteUserToSharedRoom(targetUserId)
+activate Peer
+activate S
+S -> DB : Validate peer's active focus session
+activate DB
+DB --> S : FocusSession
+deactivate DB
+
+S -> FB : Create/Join shared room\nPush invitation(targetUserId)
+activate FB
+FB --> S : success
+deactivate FB
+S --> Peer : Invitation sent successfully
+deactivate S
+deactivate Peer
+
+== Invitation Delivered ==
+FB -> U : Deliver invitation notification
+
+== Accept Invitation ==
+U -> FE : Accept Invitation (invitationId, roomId)
+activate U
+activate FE
+FE -> C : POST /shared-room/join
+deactivate FE
+activate C
+C -> S : joinSharedFocusRoom(roomId)
+activate S
+
+S -> DB : Validate user active focus session
+activate DB
+DB --> S : FocusSession
+deactivate DB
+
+S -> FB : Check shared room (capacity, membership)
+activate FB
+FB --> S : Room available
+deactivate FB
+
+S -> FB : Add user to shared room (session info)
+activate FB
+FB --> S : success
+deactivate FB
+
+S --> C : 200 OK ("Joined shared room")
+deactivate S
+C --> FE : Show success
+activate FE
+FE -> U : Display shared session view
+deactivate FE
+deactivate U
+deactivate C
+
+== Decline Invitation ==
+U -> FE : Decline Invitation (invitationId)
+activate U
+activate FE
+FE -> C : POST /shared-room/decline
+deactivate FE
+activate C
+C -> S : declineInvitation(invitationId)
+activate S
+S -> FB : Remove invitation
+activate FB
+FB --> S : success
+deactivate FB
+S --> C : 200 OK ("Invitation declined")
+deactivate S
+C --> FE : Show decline success
+activate FE
+FE -> U : Return to idle state
+deactivate FE
+deactivate U
+deactivate C
+@enduml
