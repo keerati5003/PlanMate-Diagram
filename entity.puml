@@ -1,86 +1,134 @@
 @startuml
-title Entity Class Diagram
 
-enum ExamType {
-    MIDTERM
-    FINAL
-}
-
-class User {
-    - String uid
-    - String email
-}
-
-class Term {
-    - Long termId
-    - String name
-    - LocalDate startDate
-    - LocalDate endDate
-}
-
-class Course {
-    - Long courseId
-    - String courseCode
-    - String name
-    - Long credit
-}
-
-class Topic {
-    - String id
-    - String name
-    - Long difficulty
-    - Long confidence
-    - Long estimatedStudyTime
-    - ExamType examType
-}
-
-class Assignment {
-    - Long id
-    - String name
-    - LocalDate dueDate
-    - LocalTime dueTime
-    - Long estimatedTime
-    - Boolean isCompleted
-}
-
-class Exam {
-    - String id
-    - ExamType type
-    - LocalDate date
-    - LocalTime startTime
-    - LocalTime endTime
-}
-
-class Availability {
-    - Long id
-    - LocalDate date
-    - LocalTime startTime
-    - LocalTime endTime
-}
-
-class StudyPreference {
-    - String userUid
-    - Integer minSessionDuration
-    - Integer maxSessionDuration
-    - List<String> preferredStudyTimes
-    - String revisionFrequency
-    - Integer breakDurations
+class Schedule {
+    - id: String
+    - generatedAt: LocalDateTime
+    - examType: ExamType
+    - user: User
+    - term: Term
+    - sessions: List<Session>
 }
 
 class Session {
-    - Sring sessionId
-    - LocalDate date
-    - LocalTime start
-    - LocalTime end
-    - Long duration
-    - Boolean isCompleted
-    - SessionType type
+    - sessionId: String
+    - date: LocalDate
+    - start: String
+    - end: String
+    - duration: Long
+    - isCompleted: Boolean
+    - isScheduled: Boolean
+    - sessionNumber: Integer
+    - totalSessionsInGroup: Integer
+    - type: SessionType
+    - schedule: Schedule
+    - course: Course
+    - topic: Topic
+    - assignment: Assignment
+    - focusSessions: List<FocusSession>
 }
 
-class Schedule {
-    - Long id
-    - String generatedAt
-    - ExamType examType
+class Assignment {
+    - id: String
+    - name: String
+    - dueDate: LocalDate
+    - dueTime: String
+    - estimatedTime: Long
+    - completed: Boolean
+    - examType: ExamType
+    - course: Course
+    - associatedTopics: List<Topic>
+}
+
+class Availability {
+    - id: Long
+    - date: LocalDate
+    - startTime: LocalTime
+    - endTime: LocalTime
+    - user: User
+}
+
+class Course {
+    - courseId: Long
+    - courseCode: String
+    - name: String
+    - credit: Long
+    - term: Term
+    - topics: List<Topic>
+    - assignments: List<Assignment>
+    - exams: List<Exam>
+}
+
+class Exam {
+    - id: String
+    - type: ExamType
+    - date: LocalDate
+    - startTime: String
+    - endTime: String
+    - course: Course
+}
+
+class FocusSession {
+    - id: String
+    - user: User
+    - session: Session
+    - course: Course
+    - topic: Topic
+    - assignment: Assignment
+    - focusStart: LocalDateTime
+    - focusEnd: LocalDateTime
+    - elapsedSeconds: Long
+    - plannedDuration: Long
+    - status: FocusStatus
+    - sessionType: SessionType
+}
+
+class GroupMember {
+    - id: Long
+    - user: User
+    - group: StudyGroup
+}
+
+class StudyGroup {
+    - id: Long
+    - name: String
+    - imageUrl: String
+    - joinCode: String
+    - members: List<GroupMember>
+}
+
+class StudyPreference {
+    - userUid: String
+    - minSessionDuration: Integer
+    - maxSessionDuration: Integer
+    - preferredStudyTimes: List<String>
+    - revisionFrequency: String
+    - breakDurations: Integer
+    - user: User
+}
+
+class Term {
+    - termId: Long
+    - name: String
+    - startDate: LocalDate
+    - endDate: LocalDate
+    - user: User
+    - courses: List<Course>
+}
+
+class Topic {
+    - id: String
+    - name: String
+    - difficulty: Long
+    - confidence: Long
+    - estimatedStudyTime: Long
+    - examType: ExamType
+    - course: Course
+}
+
+class User {
+    - uid: String
+    - email: String
+    - fcmToken: String
 }
 
 @enduml

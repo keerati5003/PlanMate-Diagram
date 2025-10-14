@@ -1,50 +1,182 @@
 @startuml
-title DAO Layer Class Diagram
 
+'============== Assignment & Exam ==============
 interface AssignmentDao {
-    +save(assignment: Assignment): void
-    +saveAll(assignments: List<Assignment>): void
-    +findByCourse(course: Course): List<Assignment>
+    + save(assignment: Assignment)
+    + saveAll(assignments: List<Assignment>)
+    + findByCourse(course: Course): List<Assignment>
+    + deleteByCourse(existingCourse: Course)
+    + existsById(id: String): boolean
+    + findById(id: String): Assignment
+    + deleteAll(values: Collection<Assignment>)
+    + delete(existingAssignment: Assignment)
 }
 
-interface AvailabilityDao {
-    +save(availability: Availability): void
-    +saveAll(availabilities: List<Availability>): void
-    +findByUser(user: User): List<Availability>
-}
-
-interface CourseDao {
-    +save(course: Course): void
-    +saveAll(courses: List<Course>): void
-    +findByTerm(term: Term): List<Course>
+class AssignmentDaoImpl {
+    - assignmentRepository: AssignmentRepository
 }
 
 interface ExamDao {
-    +save(exam: Exam): void
-    +saveAll(exams: List<Exam>): void
-    +findByCourse(course: Course): List<Exam>
+    + save(exam: Exam)
+    + saveAll(exams: List<Exam>)
+    + findByCourse(course: Course): List<Exam>
+    + deleteByCourse(existingCourse: Course)
+    + existsById(id: String): boolean
+    + findById(id: String): Exam
+    + deleteAll(values: Collection<Exam>)
+    + delete(existingExam: Exam)
+}
+
+class ExamDaoImpl {
+    - examRepository: ExamRepository
+}
+
+AssignmentDaoImpl ..|> AssignmentDao
+ExamDaoImpl ..|> ExamDao
+
+'============== Availability & Study Preference ==============
+interface AvailabilityDao {
+    + save(availability: Availability): Availability
+    + saveAll(availabilities: List<Availability>): List<Availability>
+    + findByUser(user: User): List<Availability>
+    + deleteByUser(user: User)
+    + deleteAll(toDelete: List<Availability>)
+}
+
+class AvailabilityDaoImpl {
+    - availabilityRepository: AvailabilityRepository
 }
 
 interface StudyPreferenceDao {
-    +savePreference(preference: StudyPreference): StudyPreference
-    +findByUserUid(userUid: String): Optional<StudyPreference>
+    + savePreference(preference: StudyPreference): StudyPreference
+    + findByUserUid(userUid: String): StudyPreference
 }
 
+class StudyPreferenceDaoImpl {
+    - repository: StudyPreferenceRepository
+}
+
+AvailabilityDaoImpl ..|> AvailabilityDao
+StudyPreferenceDaoImpl ..|> StudyPreferenceDao
+
+'============== Schedule, Session, Focus, Analytics ==============
+interface ScheduleDao {
+    + findByUser(user: User): List<Schedule>
+    + save(schedule: Schedule): Schedule
+    + findById(id: String): Optional<Schedule>
+}
+
+class ScheduleDaoImpl {
+    - scheduleRepository: ScheduleRepository
+}
+
+interface SessionDao {
+    + getOverdueSessions(user: User): List<Session>
+    + getTodaySessions(user: User): List<Session>
+    + getTomorrowSessions(user: User): List<Session>
+    + getFutureSessions(user: User): List<Session>
+    + save(session: Session): Session
+    + findById(id: String): Session
+    + countTotalPlannedSessionsForUser(uid: String): int
+    + countCompletedSessionsForUser(uid: String): int
+    + getCompletedSessions(user: User): List<Session>
+}
+
+class SessionDaoImpl {
+    - sessionRepository: SessionRepository
+}
+
+interface FocusSessionDao {
+    + save(focusSession: FocusSession): FocusSession
+    + findById(id: String): FocusSession
+    + sumFocusSecondsByUser(uid: String): long
+    + findByUserUidAndStatus(userUid: String, focusStatus: FocusStatus): FocusSession
+    + delete(focusSession: FocusSession)
+}
+
+class FocusSessionDaoImpl {
+    - focusSessionRepository: FocusSessionRepository
+}
+
+interface StudyAnalyticsDao {
+    + countCompletedSessions(userUid: String, range: String, date: LocalDate): int
+    + sumFocusDuration(userUid: String, range: String, date: LocalDate): long
+    + getSubjectBreakdown(userUid: String, range: String, date: LocalDate): Map<String, Long>
+    + getCompletedSessionsWithTimes(userUid: String, range: String, date: LocalDate): List<Object[]>
+}
+
+class StudyAnalyticsDaoImpl {
+    - focusSessionRepository: FocusSessionRepository
+}
+
+ScheduleDaoImpl ..|> ScheduleDao
+SessionDaoImpl ..|> SessionDao
+FocusSessionDaoImpl ..|> FocusSessionDao
+StudyAnalyticsDaoImpl ..|> StudyAnalyticsDao
+
+'============== Group & Study ==============
+interface StudyGroupDao {
+    + save(studyGroup: StudyGroup): StudyGroup
+    + existsByJoinCode(code: String): boolean
+    + findByJoinCode(joinCode: String): Optional<StudyGroup>
+}
+
+class StudyGroupDaoImpl {
+    - studyGroupRepository: StudyGroupRepository
+}
+
+interface GroupMemberDao {
+    + save(groupMember: GroupMember): GroupMember
+    + existsByUserAndGroup(user: User, group: StudyGroup): Boolean
+    + findByUser(user: User): List<GroupMember>
+    + findByGroupId(groupId: Long): List<GroupMember>
+}
+
+class GroupMemberDaoImpl {
+    - groupMemberRepository: GroupMemberRepository
+}
+
+StudyGroupDaoImpl ..|> StudyGroupDao
+GroupMemberDaoImpl ..|> GroupMemberDao
+
+'============== Core Entities (Term, Topic, User) ==============
 interface TermDao {
-    +save(term: Term): void
-    +findByUser(user: User): Term
+    + save(term: Term): Term
+    + findByUser(user: User): Term
+    + findById(id: Long): Optional<Term>
+    + getCurrentTermByUser(user: User): Optional<Term>
+}
+
+class TermDaoImpl {
+    - termRepository: TermRepository
 }
 
 interface TopicDao {
-    +save(topic: Topic): Topic
-    +saveAll(topics: List<Topic>): void
-    +findByCourse(course: Course): List<Topic>
+    + save(topic: Topic): Topic
+    + saveAll(topics: List<Topic>)
+    + findByCourse(course: Course): List<Topic>
+    + findById(topicId: String): Topic
+    + deleteByCourse(existingCourse: Course)
+    + existsById(id: String): boolean
+    + deleteById(existingId: String)
+}
+
+class TopicDaoImpl {
+    - topicRepository: TopicRepository
 }
 
 interface UserDao {
-    +save(user: User): User
-    +findByUid(uid: String): User
-    +findByEmail(email: String): Optional<User>
+    + save(user: User): User
+    + findByUid(uid: String): User
+    + findByEmail(email: String): Optional<User>
 }
+
+class UserDaoImpl {
+    - userRepository: UserRepository
+}
+
+TermDaoImpl ..|> TermDao
+TopicDaoImpl ..|> TopicDao
+UserDaoImpl ..|> UserDao
 
 @enduml

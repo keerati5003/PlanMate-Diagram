@@ -1,124 +1,204 @@
 @startuml
+title UML Class Diagram - Complete Service Layer
 
-interface CourseService {
-  + save(course: Course): void
-  + saveAll(courses: List<Course>): void
+'================ Interface Layer =================
+interface AssignmentService {
+    + save(assignment: Assignment): void
+    + saveAll(assignments: List<Assignment>): void
 }
 
 interface AvailabilityService {
-  + save(availability: Availability): void
-  + saveAll(availabilities: List<Availability>): void
+    + save(availability: Availability): void
+    + saveAll(availabilities: List<Availability>): void
 }
 
-interface AssignmentService {
-  + save(assignment: Assignment): void
-  + saveAll(assignments: List<Assignment>): void
-}
-
-interface ScheduleService {
-  + getScheduleForUser(): ScheduleDTO
-  + saveSchedule(dto: ScheduleDTO): void
-  + generateScheduleFromFastAPI(setupDTO: StudySetupDTO): ScheduleDTO
-}
-
-'================ Implementations ==================
-class CourseServiceImpl {
-  - courseDao: CourseDao
-}
-
-class AvailabilityServiceImpl {
-  - availabilityDao: AvailabilityDao
-}
-
-class AssignmentServiceImpl {
-  - assignmentDao: AssignmentDao
-}
-
-class ScheduleServiceImpl {
-  - scheduleDao: ScheduleDao
-  - userDao: UserDao
-  - courseDao: CourseDao
-  - topicDao: TopicDao
-  - assignmentDao: AssignmentDao
-  - studyPreferenceDao: StudyPreferenceDao
-  - mapper: DTOMapper
-}
-
-'================ Relationships ==================
-CourseServiceImpl ..|> CourseService
-AvailabilityServiceImpl ..|> AvailabilityService
-AssignmentServiceImpl ..|> AssignmentService
-ScheduleServiceImpl ..|> ScheduleService
-
-@enduml
-
-@startuml
-
-'================ Interfaces ==================
-interface UserService {
-  + save(user: User): User
-  + findByUid(uid: String): User
-}
-
-interface TopicService {
-  + save(topic: Topic): void
-  + saveAll(topics: List<Topic>): void
-}
-
-interface TermService {
-  + save(term: Term): void
-}
-
-interface StudySetupService {
-  + processStudySetup(userUid: String, dto: StudySetupDTO): void
-  + getStudySetup(userUid: String): StudySetupDTO
-}
-
-interface StudyPreferenceService {
-  + getPreference(userUid: String): StudyPreferenceDTO
-  + saveOrUpdate(userUid: String, dto: StudyPreferenceDTO): StudyPreferenceDTO
+interface CourseService {
+    + save(course: Course): void
+    + saveAll(courses: List<Course>): void
 }
 
 interface ExamService {
-  + save(exam: Exam): void
-  + saveAll(exams: List<Exam>): void
+    + save(exam: Exam): void
+    + saveAll(exams: List<Exam>): void
 }
 
-class UserServiceImpl {
-  - userDao: UserDao
+interface FcmService {
+    + saveFcmToken(token: String): void
+    + sendNotification(notificationDTO: NotificationDTO): void
 }
 
-class TopicServiceImpl {
-  - topicDao: TopicDao
+interface FocusSessionService {
+    + getFocusSessionById(id: String): FocusSessionDTO
+    + getActiveFocusSessionForUser(userUid: String): FocusSessionDTO
+    + startFocusSession(sessionId: String): Map<String, Object>
+    + pauseFocusSession(focusSessionId: String): FocusSessionDTO
+    + resumeFocusSession(focusSessionId: String): FocusSessionDTO
+    + endFocusSession(focusSessionId: String): FocusSessionDTO
+    + inviteUserToSharedRoom(targetUserId: String): Map<String, Object>
+    + joinSharedFocusRoom(roomId: String): Map<String, Object>
+    + declineInvitation(invitationId: String): Map<String, Object>
 }
 
-class TermServiceImpl {
-  - termDao: TermDao
+interface ScheduleService {
+    + getSchedule(): ScheduleDTO
+    + saveSchedule(dto: ScheduleDTO): ScheduleDTO
+    + updateSchedule(dto: ScheduleDTO): ScheduleDTO
+    + generateScheduleFromFastAPI(setupDTO: StudySetupDTO): ScheduleDTO
 }
 
-class StudySetupServiceImpl {
-  - userDao: UserDao
-  - courseDao: CourseDao
-  - topicDao: TopicDao
-  - examDao: ExamDao
-  - assignmentDao: AssignmentDao
-  - availabilityDao: AvailabilityDao
+interface SessionService {
+    + getToDoListSessions(): Map<String, List<SessionDTO>>
+    + getCompletedSessions(): List<SessionDTO>
 }
 
-class StudyPreferenceServiceImpl {
-  - studyPreferenceDao: StudyPreferenceDao
-  - studyPreferenceMapper: StudyPreferenceMapper
+interface StudyAnalyticsService {
+    + getAnalytics(range: Range, date: LocalDate): StudyAnalyticsDTO
+}
+
+interface StudyGroupService {
+    + getGroups(): List<StudyGroupResponseDTO>
+    + createGroup(groupInfo: GroupRequestDTO): ResponseEntity
+    + joinGroup(joinCode: String): ResponseEntity
+    + getGroupProgress(groupId: Long): List<GroupMemberProgressDTO>
+}
+
+interface StudyPreferenceService {
+    + getPreference(): StudyPreferenceDTO
+    + saveOrUpdate(dto: StudyPreferenceDTO): StudyPreferenceDTO
+}
+
+interface StudySetupService {
+    + processStudySetup(dto: StudySetupDTO): void
+    + getTermById(termId: Long): TermResponseDTO
+    + getCurrentTerm(): TermResponseDTO
+    + saveTerm(termDTO: TermRequestDTO, termId: Long): TermResponseDTO
+    + saveAllCourses(termId: Long, courseDTOs: List<CourseResponseDTO>): List<CourseResponseDTO>
+    + deleteCourse(courseId: Long): void
+    + updateCourseDetails(details: CourseResponseDTO): CourseResponseDTO
+    + saveAvailabilities(availabilities: List<AvailabilityRequestDTO>): List<AvailabilityDTO>
+    + getAvailabilities(): List<AvailabilityDTO>
+    + getStudySetup(): StudySetupDTO
+}
+
+interface TermService {
+    + save(term: Term): void
+}
+interface TopicService {
+    + save(topic: Topic): void
+    + saveAll(topics: List<Topic>): void
+}
+
+interface UserService {
+    + save(user: User): User
+    + findByUid(uid: String): User
+    + updateFcmToken(uid: String, token: String): void
+    + getFcmToken(uid: String): String
+}
+
+'================ Implementation Layer =================
+class AssignmentServiceImpl {
+    - assignmentDao: AssignmentDao
+}
+
+class AvailabilityServiceImpl {
+    - availabilityDao: AvailabilityDao
+}
+
+class CourseServiceImpl {
+    - courseDao: CourseDao
 }
 
 class ExamServiceImpl {
-  - examDao: ExamDao
+    - examDao: ExamDao
 }
 
-UserServiceImpl ..|> UserService
-TopicServiceImpl ..|> TopicService
-TermServiceImpl ..|> TermService
-StudySetupServiceImpl ..|> StudySetupService
-StudyPreferenceServiceImpl ..|> StudyPreferenceService
+class FcmServiceImpl {
+    - userService: UserService
+}
+
+class FocusSessionServiceImpl {
+    - focusSessionDao: FocusSessionDao
+    - sessionDao: SessionDao
+    - groupMemberDao: GroupMemberDao
+    - userDao: UserDao
+    - firebaseFocusService: FirebaseFocusService
+    - firebaseAuth: FirebaseAuth
+    - dtoMapper: DTOMapper
+}
+
+class ScheduleServiceImpl {
+    - scheduleDao: ScheduleDao
+    - userDao: UserDao
+    - courseDao: CourseDao
+    - topicDao: TopicDao
+    - termDao: TermDao
+    - assignmentDao: AssignmentDao
+    - mapper: DTOMapper
+    - studyPreferenceDao: StudyPreferenceDao
+}
+
+class SessionServiceImpl {
+    - sessionDao: SessionDao
+    - userDao: UserDao
+    - dtoMapper: DTOMapper
+}
+
+class StudyAnalyticsServiceImpl {
+    - studyAnalyticsDao: StudyAnalyticsDao
+}
+
+class StudyGroupServiceImpl {
+    - studyGroupDao: StudyGroupDao
+    - groupMemberDao: GroupMemberDao
+    - sessionDao: SessionDao
+    - focusSessionDao: FocusSessionDao
+    - userDao: UserDao
+    - firebaseAuth: FirebaseAuth
+}
+
+class StudyPreferenceServiceImpl {
+    - studyPreferenceDao: StudyPreferenceDao
+    - userService: UserService
+    - mapper: DTOMapper
+}
+
+class StudySetupServiceImpl {
+    - userDao: UserDao
+    - termDao: TermDao
+    - courseDao: CourseDao
+    - topicDao: TopicDao
+    - examDao: ExamDao
+    - assignmentDao: AssignmentDao
+    - availabilityDao: AvailabilityDao
+    - mapper: DTOMapper
+}
+
+class TermServiceImpl {
+    - termDao: TermDao
+}
+class TopicServiceImpl {
+    - topicDao: TopicDaoImpl
+}
+
+class UserServiceImpl {
+    - userDao: UserDao
+}
+
+'================ Relationships =================
+AssignmentServiceImpl ..|> AssignmentService
+AvailabilityServiceImpl ..|> AvailabilityService
+CourseServiceImpl ..|> CourseService
 ExamServiceImpl ..|> ExamService
+FcmServiceImpl ..|> FcmService
+FocusSessionServiceImpl ..|> FocusSessionService
+ScheduleServiceImpl ..|> ScheduleService
+SessionServiceImpl ..|> SessionService
+StudyAnalyticsServiceImpl ..|> StudyAnalyticsService
+StudyGroupServiceImpl ..|> StudyGroupService
+StudyPreferenceServiceImpl ..|> StudyPreferenceService
+StudySetupServiceImpl ..|> StudySetupService
+TermServiceImpl ..|> TermService
+TopicServiceImpl ..|> TopicService
+UserServiceImpl ..|> UserService
 
 @enduml

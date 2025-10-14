@@ -1,132 +1,239 @@
 @startuml
-title DTO Class Diagram
+title Complete DTO UML Class Diagram (private fields)
 
-class TermRequestDTO {
-    - String name
-    - String startDate
-    - String endDate
+class MemberProfileDTO {
+    - id: Long
+    - memberId: String
+    - displayName: String
+    - photoUrl: String
 }
 
-class TermResponseDTO {
-    - Long termId
-    - String name
-    - String startDate
-    - String endDate
-    - List<CourseDTO> courses
+class GroupMemberDTO {
+    - id: Long
+    - user: User
+}
+
+class GroupMemberProgressDTO {
+    - id: Long
+    - member: MemberProfileDTO
+    - completedSessions: int
+    - totalFocusSeconds: long
+    - percentageCompleted: double
+    - points: long
+}
+
+class GroupRequestDTO {
+    - id: Long
+    - groupName: String
+    - imageUrl: String
+}
+
+class StudyGroupResponseDTO {
+    - id: Long
+    - name: String
+    - imageUrl: String
+    - joinCode: String
+    - members: List<GroupMemberDTO>
+}
+
+class NotificationDTO {
+    - id: Long
+    - title: String
+    - content: String
+    - isRead: Boolean
+    - type: NotificationType
+    - time: LocalDateTime
+}
+
+class NotificationRequestDTO {
+    - id: Long
+    - userUid: String
+    - title: String
+    - content: String
+    - type: NotificationType
 }
 
 class CourseBaseDTO {
-    - String courseCode
-    - String name
-    - Long credit
+    - id: Long
+    - courseCode: String
+    - name: String
+    - credit: Long
 }
 
-class CourseDTO {
-    - Long courseId
-    - List<TopicDTO> topics
-    - List<AssignmentDTO> assignments
-    - List<ExamDTO> exams
-}
-
-class TopicDTO {
-    - String name
-    - Long difficulty
-    - Long confidence
-    - Long estimatedStudyTime
-    - ExamType examType
+class CourseResponseDTO {
+    - id: Long
+    - courseId: Long
+    - topics: List<TopicDTO>
+    - assignments: List<AssignmentDTO>
+    - exams: List<ExamDTO>
 }
 
 class AssignmentDTO {
-    - String id
-    - String name
-    - LocalDate dueDate
-    - LocalTime dueTime
-    - Long estimatedTime
-    - List<String> associatedTopicIds
-    - ExamType examType
-    - Boolean isCompleted
+    - id: Long
+    - name: String
+    - dueDate: LocalDate
+    - dueTime: LocalTime
+    - estimatedTime: Long
+    - examType: ExamType
+    - completed: Boolean
+    - associatedTopicIds: List<String>
 }
 
 class ExamDTO {
-    - String id
-    - ExamType type
-    - LocalDate date
-    - LocalTime startTime
-    - LocalTime endTime
+    - id: Long
+    - type: ExamType
+    - startTime: LocalTime
+    - endTime: LocalTime
+    - date: LocalDate
 }
 
-class StudyPreferenceDTO {
-    - String userUid
-    - Integer minSessionDuration
-    - Integer maxSessionDuration
-    - List<String> preferredStudyTimes
-    - String revisionFrequency
-    - Integer breakDurations
+class TopicDTO {
+    - id: Long
+    - name: String
+    - difficulty: Long
+    - confidence: Long
+    - estimatedStudyTime: Long
+    - examType: ExamType
+}
+
+class TermRequestDTO {
+    - id: Long
+    - name: String
+    - startDate: LocalDate
+    - endDate: LocalDate
+}
+
+class TermResponseDTO {
+    - id: Long
+    - termId: Long
+    - name: String
+    - startDate: LocalDate
+    - endDate: LocalDate
+    - courses: List<CourseResponseDTO>
 }
 
 class AvailabilityDTO {
-    - LocalDate date
-    - LocalTime startTime
-    - LocalTime endTime
+    - id: Long
+    - date: LocalDate
+    - startTime: LocalTime
+    - endTime: LocalTime
 }
 
-class GeneratePlanRequestDTO {
-    - StudyPreferenceDTO studyPreference
-    - StudySetupDTO studySetup
+class AvailabilityRequestDTO {
+    - id: Long
+    - date: LocalDate
+    - startTime: LocalTime
+    - endTime: LocalTime
+}
+
+class StudyPreferenceDTO {
+    - id: Long
+    - minSessionDuration: Integer
+    - maxSessionDuration: Integer
+    - preferredStudyTimes: List<String>
+    - revisionFrequency: String
+    - breakDurations: Integer
 }
 
 class StudySetupDTO {
-    - TermResponseDTO term
-    - List<AvailabilityDTO> availabilities
+    - id: Long
+    - term: TermResponseDTO
+    - availabilities: List<AvailabilityDTO>
 }
 
-class SessionDTO {
-    - String sessionId
-    - Long courseId
-    - Long duration
-    - SessionType type
-    - LocalDate date
-    - LocalTime start
-    - LocalTime end
-    - Boolean isScheduled
-    - String topicId
-    - String assignmentId
+class GeneratePlanRequestDTO {
+    - id: Long
+    - studyPreference: StudyPreferenceDTO
+    - studySetup: StudySetupDTO
 }
 
 class ScheduleDTO {
-    - List<SessionDTO> study_plan
-    - List<SessionDTO> unscheduled_plan
-}
-
-class SessionViewDTO {
-    - String sessionId
-    - String courseCode
-    - String topicName
-    - String assignmentName
-    - LocalDate date
-    - LocalTime start
-    - LocalTime end
-    - Long duration
-    - SessionType type
-    - Boolean isScheduled
-    - Boolean isCompleted
+    - id: Long
+    - generatedAt: String
+    - examType: ExamType
+    - termId: Long
+    - studyPlan: List<SessionDTO>
+    - unscheduledPlan: List<SessionDTO>
 }
 
 class ScheduleViewDTO {
-    - List<SessionViewDTO> studyPlan;
-    - List<SessionViewDTO> unscheduledPlan;
+    - id: Long
+    - studyPlan: List<SessionViewDTO>
+    - unscheduledPlan: List<SessionViewDTO>
 }
 
-CourseResponseDTO --|> CourseBaseDTO
-CourseResponseDTO --> CourseId
-TermResponseDTO --> CourseResponseDTO
-TermDTO --> CourseDTO
-StudySetupDTO --> TermDTO
-AIPlanRequestDTO --> StudyPreferenceDTO
-AIPlanRequestDTO --> AvailabilityDTO
-AIPlanRequestDTO --> CourseDTO
-AIPlanRequestDTO --> TopicDTO
-AIPlanRequestDTO --> AssignmentDTO
-AIPlanRequestDTO --> ExamDTO
+class SessionDTO {
+    - id: Long
+    - sessionId: String
+    - courseId: Long
+    - duration: Long
+    - type: SessionType
+    - isScheduled: Boolean
+    - isCompleted: Boolean
+    - sessionNumber: Integer
+    - totalSessionsInGroup: Integer
+    - date: LocalDate
+    - start: String
+    - end: String
+    - topicId: String
+    - assignmentId: String
+}
+
+class SessionViewDTO {
+    - id: Long
+    - sessionId: String
+    - courseCode: String
+    - topicName: String
+    - assignmentName: String
+    - date: LocalDate
+    - start: String
+    - end: String
+    - duration: Long
+    - type: SessionType
+    - isScheduled: Boolean
+    - isCompleted: Boolean
+}
+
+class FocusSessionDTO {
+    - id: Long
+    - session: SessionDTO
+    - courseId: Long
+    - topicId: String
+    - assignmentId: String
+    - courseName: String
+    - displayName: String
+    - focusStart: LocalDateTime
+    - focusEnd: LocalDateTime
+    - elapsedSeconds: Long
+    - plannedDuration: Long
+    - status: FocusStatus
+    - sessionType: SessionType
+    - topicName: String
+    - assignmentName: String
+}
+
+class StudyAnalyticsDTO {
+    - id: Long
+    - totalCompletedFocusSessions: int
+    - totalFocusDuration: long
+    - subjectBreakdown: Map<String, Long>
+    - focusSessions: List<FocusSessionDetailDTO>
+}
+
+class FocusSessionDetailDTO {
+    - id: Long
+    - courseName: String
+    - focusStart: LocalDateTime
+    - focusEnd: LocalDateTime
+    - elapsed: long
+}
+
+class ToDoListResponseDTO {
+    - id: Long
+    - overdue: List<SessionDTO>
+    - today: List<SessionDTO>
+    - tomorrow: List<SessionDTO>
+    - upcoming: List<SessionDTO>
+}
 
 @enduml
