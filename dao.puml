@@ -1,6 +1,6 @@
 @startuml
 
-'============== Assignment & Exam ==============
+' === Assignment ===
 interface AssignmentDao {
     + save(assignment: Assignment)
     + saveAll(assignments: List<Assignment>)
@@ -16,6 +16,41 @@ class AssignmentDaoImpl {
     - assignmentRepository: AssignmentRepository
 }
 
+AssignmentDaoImpl ..|> AssignmentDao
+
+' === Availability ===
+interface AvailabilityDao {
+    + save(availability: Availability): Availability
+    + saveAll(availabilities: List<Availability>): List<Availability>
+    + findByUser(user: User): List<Availability>
+    + deleteByUser(user: User)
+    + deleteAll(toDelete: List<Availability>)
+}
+
+class AvailabilityDaoImpl {
+    - availabilityRepository: AvailabilityRepository
+}
+
+AvailabilityDaoImpl ..|> AvailabilityDao
+
+' === Course ===
+interface CourseDao {
+    + save(course: Course): Course
+    + saveAll(courses: List<Course>): List<Course>
+    + findByTerm(term: Term): List<Course>
+    + findById(courseId: Long): Course
+    + delete(existingCourse: Course)
+    + flush()
+    + deleteAllByIdInBatch(idsToDelete: Set<Long>)
+}
+
+class CourseDaoImpl {
+    - courseRepository: CourseRepository
+}
+
+CourseDaoImpl ..|> CourseDao
+
+' === Exam ===
 interface ExamDao {
     + save(exam: Exam)
     + saveAll(exams: List<Exam>)
@@ -31,35 +66,64 @@ class ExamDaoImpl {
     - examRepository: ExamRepository
 }
 
-AssignmentDaoImpl ..|> AssignmentDao
 ExamDaoImpl ..|> ExamDao
 
-'============== Availability & Study Preference ==============
-interface AvailabilityDao {
-    + save(availability: Availability): Availability
-    + saveAll(availabilities: List<Availability>): List<Availability>
-    + findByUser(user: User): List<Availability>
-    + deleteByUser(user: User)
-    + deleteAll(toDelete: List<Availability>)
+' === FocusSession ===
+interface FocusSessionDao {
+    + save(focusSession: FocusSession): FocusSession
+    + findById(id: String): FocusSession
+    + sumFocusSecondsByUser(uid: String): long
+    + findByUserUidAndStatus(userUid: String, focusStatus: FocusStatus): FocusSession
+    + delete(focusSession: FocusSession)
 }
 
-class AvailabilityDaoImpl {
-    - availabilityRepository: AvailabilityRepository
+class FocusSessionDaoImpl {
+    - focusSessionRepository: FocusSessionRepository
 }
 
-interface StudyPreferenceDao {
-    + savePreference(preference: StudyPreference): StudyPreference
-    + findByUserUid(userUid: String): StudyPreference
+FocusSessionDaoImpl ..|> FocusSessionDao
+
+' === GroupMember ===
+interface GroupMemberDao {
+    + save(groupMember: GroupMember): GroupMember
+    + existsByUserAndGroup(user: User, group: StudyGroup): Boolean
+    + findByUser(user: User): List<GroupMember>
+    + findByGroupId(groupId: Long): List<GroupMember>
 }
 
-class StudyPreferenceDaoImpl {
-    - repository: StudyPreferenceRepository
+class GroupMemberDaoImpl {
+    - groupMemberRepository: GroupMemberRepository
 }
 
-AvailabilityDaoImpl ..|> AvailabilityDao
-StudyPreferenceDaoImpl ..|> StudyPreferenceDao
+GroupMemberDaoImpl ..|> GroupMemberDao
 
-'============== Schedule, Session, Focus, Analytics ==============
+' === Notification ===
+interface NotificationDao {
+    + getNotificationById(id: Long): Notification
+    + saveNotification(notification: Notification)
+    + getNotificationsByUser(user: User): List<Notification>
+}
+
+class NotificationDaoImpl {
+    - notificationRepository: NotificationRepository
+}
+
+NotificationDaoImpl ..|> NotificationDao
+
+' === PendingNotification ===
+interface PendingNotificationDao {
+    + findByTargetUserUid(targetUserUid: String): List<PendingNotification>
+    + save(pending: PendingNotification)
+    + delete(pending: PendingNotification)
+}
+
+class PendingNotificationDaoImpl {
+    - pendingNotificationRepository: PendingNotificationRepository
+}
+
+PendingNotificationDaoImpl ..|> PendingNotificationDao
+
+' === Schedule ===
 interface ScheduleDao {
     + findByUser(user: User): List<Schedule>
     + save(schedule: Schedule): Schedule
@@ -70,6 +134,9 @@ class ScheduleDaoImpl {
     - scheduleRepository: ScheduleRepository
 }
 
+ScheduleDaoImpl ..|> ScheduleDao
+
+' === Session ===
 interface SessionDao {
     + getOverdueSessions(user: User): List<Session>
     + getTodaySessions(user: User): List<Session>
@@ -86,18 +153,9 @@ class SessionDaoImpl {
     - sessionRepository: SessionRepository
 }
 
-interface FocusSessionDao {
-    + save(focusSession: FocusSession): FocusSession
-    + findById(id: String): FocusSession
-    + sumFocusSecondsByUser(uid: String): long
-    + findByUserUidAndStatus(userUid: String, focusStatus: FocusStatus): FocusSession
-    + delete(focusSession: FocusSession)
-}
+SessionDaoImpl ..|> SessionDao
 
-class FocusSessionDaoImpl {
-    - focusSessionRepository: FocusSessionRepository
-}
-
+' === StudyAnalytics ===
 interface StudyAnalyticsDao {
     + countCompletedSessions(userUid: String, range: String, date: LocalDate): int
     + sumFocusDuration(userUid: String, range: String, date: LocalDate): long
@@ -109,12 +167,9 @@ class StudyAnalyticsDaoImpl {
     - focusSessionRepository: FocusSessionRepository
 }
 
-ScheduleDaoImpl ..|> ScheduleDao
-SessionDaoImpl ..|> SessionDao
-FocusSessionDaoImpl ..|> FocusSessionDao
 StudyAnalyticsDaoImpl ..|> StudyAnalyticsDao
 
-'============== Group & Study ==============
+' === StudyGroup ===
 interface StudyGroupDao {
     + save(studyGroup: StudyGroup): StudyGroup
     + existsByJoinCode(code: String): boolean
@@ -125,21 +180,21 @@ class StudyGroupDaoImpl {
     - studyGroupRepository: StudyGroupRepository
 }
 
-interface GroupMemberDao {
-    + save(groupMember: GroupMember): GroupMember
-    + existsByUserAndGroup(user: User, group: StudyGroup): Boolean
-    + findByUser(user: User): List<GroupMember>
-    + findByGroupId(groupId: Long): List<GroupMember>
-}
-
-class GroupMemberDaoImpl {
-    - groupMemberRepository: GroupMemberRepository
-}
-
 StudyGroupDaoImpl ..|> StudyGroupDao
-GroupMemberDaoImpl ..|> GroupMemberDao
 
-'============== Core Entities (Term, Topic, User) ==============
+' === StudyPreference ===
+interface StudyPreferenceDao {
+    + savePreference(preference: StudyPreference): StudyPreference
+    + findByUserUid(userUid: String): StudyPreference
+}
+
+class StudyPreferenceDaoImpl {
+    - repository: StudyPreferenceRepository
+}
+
+StudyPreferenceDaoImpl ..|> StudyPreferenceDao
+
+' === Term ===
 interface TermDao {
     + save(term: Term): Term
     + findByUser(user: User): Term
@@ -151,6 +206,9 @@ class TermDaoImpl {
     - termRepository: TermRepository
 }
 
+TermDaoImpl ..|> TermDao
+
+' === Topic ===
 interface TopicDao {
     + save(topic: Topic): Topic
     + saveAll(topics: List<Topic>)
@@ -165,6 +223,9 @@ class TopicDaoImpl {
     - topicRepository: TopicRepository
 }
 
+TopicDaoImpl ..|> TopicDao
+
+' === User ===
 interface UserDao {
     + save(user: User): User
     + findByUid(uid: String): User
@@ -175,8 +236,6 @@ class UserDaoImpl {
     - userRepository: UserRepository
 }
 
-TermDaoImpl ..|> TermDao
-TopicDaoImpl ..|> TopicDao
 UserDaoImpl ..|> UserDao
 
 @enduml

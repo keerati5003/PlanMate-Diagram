@@ -129,6 +129,27 @@ class User {
     - uid: String
     - email: String
     - fcmToken: String
+    - notifications: List<Notification>
+    - pendingNotifications: List<PendingNotification>
+}
+
+class Notification {
+    - id: long
+    - title: String
+    - content: String
+    - isRead: Boolean
+    - type: NotificationType
+    - time: LocalDateTime
+    - user: User
+}
+
+class PendingNotification {
+    - id: Long
+    - targetUserUid: String
+    - title: String
+    - content: String
+    - type: NotificationType
+    - createdAt: LocalDateTime
 }
 
 @enduml

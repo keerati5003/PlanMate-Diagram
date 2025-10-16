@@ -2,38 +2,79 @@
 title Repository Interfaces UML Class Diagram
 
 interface AssignmentRepository {
-    + findByCourse(course: Course) : List<Assignment>
+    + findByCourse(course: Course): List<Assignment>
 }
 
 interface AvailabilityRepository {
-    + findByUser(user: User) : List<Availability>
-    + deleteByUser(user: User) : void
+    + findByUser(user: User): List<Availability>
+    + deleteByUser(user: User): void
 }
 
 interface CourseRepository {
-    + findByTerm(term: Term) : List<Course>
+    + findByTerm(term: Term): List<Course>
 }
 
 interface ExamRepository {
-    + findByCourse(course: Course) : List<Exam>
+    + findByCourse(course: Course): List<Exam>
+}
+
+interface FocusSessionRepository {
+    + countByUserUidAndStatusAndFocusStartBetween(userUid: String, status: FocusStatus, start: LocalDateTime, end: LocalDateTime): int
+    + sumElapsedSeconds(userUid: String, status: FocusStatus, start: LocalDateTime, end: LocalDateTime): long
+    + groupByCourseName(userUid: String, status: FocusStatus, start: LocalDateTime, end: LocalDateTime): List<Object[]>
+    + sumElapsedSecondsByUserUid(uid: String): long
+    + findByUserUidAndStatus(userUid: String, focusStatus: FocusStatus): Optional<FocusSession>
+    + findCompletedSessionsWithTimes(userUid: String, status: FocusStatus, start: LocalDateTime, end: LocalDateTime): List<Object[]>
+}
+
+interface GroupMemberRepository {
+    + existsByUserAndGroup(user: User, group: StudyGroup): Boolean
+    + findByUser(user: User): List<GroupMember>
+    + findByGroupId(groupId: Long): List<GroupMember>
+}
+
+interface NotificationRepository {
+    + findByUserOrderByTimeDesc(user: User): List<Notification>
+}
+
+interface PendingNotificationRepository {
+    + findByTargetUserUid(targetUserUid: String): List<PendingNotification>
+}
+
+interface ScheduleRepository {
+    + findByUser(user: User): List<Schedule>
+}
+
+interface SessionRepository {
+    + findBySchedule_UserAndDate(user: User, date: LocalDate): List<Session>
+    + findBySchedule_UserAndDateAfter(user: User, date: LocalDate): List<Session>
+    + countBySchedule_User_Uid(uid: String): int
+    + countBySchedule_User_UidAndFocusSessions_Status(uid: String, status: FocusStatus): int
+    + findTodayActiveSessions(user: User): List<Session>
+    + findOverdueSessions(user: User): List<Session>
+    + getCompletedSessions(user: User): List<Session>
+}
+
+interface StudyGroupRepository {
+    + existsByJoinCode(code: String): boolean
+    + findByJoinCode(joinCode: String): Optional<StudyGroup>
 }
 
 interface StudyPreferenceRepository {
-    // no custom methods
 }
 
 interface TermRepository {
-    + findByUser(user: User) : Term
-    + findCurrentTerm(user: User) : Optional<Term>
+    + findByUser(user: User): Term
+    + getCurrentTermByUser(user: User): Optional<Term>
 }
 
 interface TopicRepository {
-    + findByCourse(course: Course) : List<Topic>
+    + findByCourse(course: Course): List<Topic>
 }
 
 interface UserRepository {
-    + findByUid(uid: String) : User
-    + findByEmail(email: String) : Optional<User>
+    + findByUid(uid: String): User
+    + findByEmail(email: String): Optional<User>
 }
 
 @enduml
