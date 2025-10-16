@@ -27,4 +27,11 @@ enum Range {
     YEAR
 }
 
+enum NotificationType {
+    GENERAL
+    DEADLINE
+    RANKING
+    STREAK
+}
+
 @enduml
