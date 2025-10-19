@@ -7,55 +7,77 @@ participant "Service" as S
 participant "FCM" as FCM
 database "Database" as DB
 
+User -> FE : Launch application
 activate User
-User -> FE : Grant notification permission
 activate FE
-FE -> FCM : Request FCM token
+FE -> FCM : Retrieve FCM token
 activate FCM
 FCM --> FE : Return FCM token
 deactivate FCM
 FE -> C : POST /notification/token { token }
-deactivate FE
 activate C
 C -> S : saveFcmToken(token)
 activate S
-S -> S : Get authenticated UID
 S -> DB : Update user record with FCM token
 activate DB
+DB --> S : success
+S -> DB : Check pending notifications
+DB --> S : Return pending list
+S -> FCM : Send pending notifications
+activate FCM
+FCM --> S : Delivery response
+deactivate FCM
+S -> DB : Save delivered notifications / remove from pending
 DB --> S : success
 deactivate DB
 S --> C : OK
 deactivate S
-C --> FE : 200 OK
-activate FE
-FE -> User : Token saved
+C --> FE : 200 OK "Token saved"
 deactivate C
-deactivate User
 
-FE -> C : POST /notification/send { NotificationDTO }
-deactivate FE
+FE -> C : POST /notification/send { NotificationRequestDTO }
 activate C
-C -> S : sendNotification(NotificationDTO)
+C -> S : sendNotification(NotificationRequestDTO)
 activate S
-S -> S : Get authenticated UID
 S -> DB : Get user's FCM token
 activate DB
 DB --> S : Return token
-deactivate DB
 S -> FCM : Send message (token, title, body)
 activate FCM
-FCM --> S : Delivery response
+alt Delivery success
+    FCM --> S : OK
+    S -> DB : Save notification to database
+    DB --> S : success
+else Delivery fails
+    FCM --> S : Error
+    S -> DB : Save notification to pending queue
+    DB --> S : saved
+deactivate DB
+end
 deactivate FCM
-S --> C : OK
+S --> C : Response
 deactivate S
-C --> FE : 200 OK
-activate FE
+C --> FE : 200 OK / 503 Pending
+deactivate C
+
 FE -> DEVICE : Trigger OS/browser push notification
 activate DEVICE
 DEVICE -> User : Display push notification
 deactivate DEVICE
-activate User
-FE -> User : Display in-app notification
+
+FE -> C : GET /notification
+activate C
+C -> S : getNotificationsForCurrentUser()
+activate S
+S -> DB : Retrieve notifications for user
+activate DB
+DB --> S : Return list
+deactivate DB
+S --> C : List<NotificationDTO>
+deactivate S
+C --> FE : 200 OK with notifications
+deactivate C
+FE -> User : Display in-app notifications
 deactivate FE
 deactivate User
 @enduml
